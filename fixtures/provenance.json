@@ -1,0 +1,45 @@
+{
+    "source_repository":  "https://github.com/zcash-hackworks/darksidewalletd-test-data",
+    "source_commit":  "4aa4e669a5f03aa954e6720817f52eaab2226708",
+    "license":  "MIT",
+    "selected_on":  "2026-10-25",
+    "verification":  "Parsed and decrypted with zcash_primitives 0.31.0, zcash_client_backend 0.25.0, sapling-crypto 0.9.0. The fixture gate validates canonical transaction IDs and zero transparent inputs/outputs; it does not perform consensus validation.",
+    "artifacts":  [
+                      {
+                          "file":  "fixtures/transactions/61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649.hex",
+                          "role":  "payment",
+                          "source":  "https://raw.githubusercontent.com/zcash-hackworks/darksidewalletd-test-data/4aa4e669a5f03aa954e6720817f52eaab2226708/testnet-canopy/pre-activation-txs/61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649.txt",
+                          "txid":  "61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649",
+                          "hex_file_sha256":  "7c676c512a9cbebe6a23aa1a387b161a4836580b2582e2317cc76c1b69ebbcce",
+                          "transaction_bytes_sha256":  "4aaa2ea9d5e3d6b1acb3d8b126da556643787b606b287a8e3ef0ee75ef82234a",
+                          "transaction_bytes":  2373
+                      },
+                      {
+                          "file":  "fixtures/transactions/8f064d23c66dc36e32445e5f3b50e0f32ac3ddb78cff21fb521eb6c19c07c99a.hex",
+                          "role":  "unrelated cover",
+                          "source":  "https://raw.githubusercontent.com/zcash-hackworks/darksidewalletd-test-data/4aa4e669a5f03aa954e6720817f52eaab2226708/transactions/recv/8f064d23c66dc36e32445e5f3b50e0f32ac3ddb78cff21fb521eb6c19c07c99a.txt",
+                          "txid":  "8f064d23c66dc36e32445e5f3b50e0f32ac3ddb78cff21fb521eb6c19c07c99a",
+                          "hex_file_sha256":  "1ee0b2e34c511293e7ad63f0b49b15d5256c3e68f57c4489aec4133936b43011",
+                          "transaction_bytes_sha256":  "420bbd6ab438ec12e15383715fafd4e7e4338be7fea3144dfc3aafdc44054996",
+                          "transaction_bytes":  2373
+                      },
+                      {
+                          "file":  "fixtures/transactions/15a677b6770c5505fb47439361d3d3a7c21238ee1a6874fdedad18ae96850590.hex",
+                          "role":  "unrelated cover",
+                          "source":  "https://raw.githubusercontent.com/zcash-hackworks/darksidewalletd-test-data/4aa4e669a5f03aa954e6720817f52eaab2226708/transactions/recv/15a677b6770c5505fb47439361d3d3a7c21238ee1a6874fdedad18ae96850590.txt",
+                          "txid":  "15a677b6770c5505fb47439361d3d3a7c21238ee1a6874fdedad18ae96850590",
+                          "hex_file_sha256":  "e7196b7dc34ea681e02c4dd9d74c6e7def8aa622abf6affdb0ddbeb355497ca0",
+                          "transaction_bytes_sha256":  "e30cfac6b46f75d842210264275cad36259c94c54781d26126e930340a2636a6",
+                          "transaction_bytes":  2373
+                      },
+                      {
+                          "file":  "fixtures/payment.hex",
+                          "role":  "canonical staged payment, identical bytes to txid-named source",
+                          "source":  "https://raw.githubusercontent.com/zcash-hackworks/darksidewalletd-test-data/4aa4e669a5f03aa954e6720817f52eaab2226708/testnet-canopy/pre-activation-txs/61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649.txt",
+                          "txid":  "61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649",
+                          "hex_file_sha256":  "7c676c512a9cbebe6a23aa1a387b161a4836580b2582e2317cc76c1b69ebbcce",
+                          "transaction_bytes_sha256":  "4aaa2ea9d5e3d6b1acb3d8b126da556643787b606b287a8e3ef0ee75ef82234a",
+                          "transaction_bytes":  2373
+                      }
+                  ]
+}

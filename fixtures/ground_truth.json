@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "network": "test",
+  "scan_start": 1028500,
+  "scan_end": 1028510,
+  "payment": {
+    "txid": "61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649",
+    "height": 1028505,
+    "output_index": 0,
+    "value_zat": 70000000,
+    "pool": "sapling",
+    "memo_plaintext": "To Han\nfrom ztestsapling1z489megpkwwmv3gt6jtldkrx8ry3pj2gyt27kv9f72kdprum0lktxf53p7kt97jd4tjcw4f7zaz\u0001",
+    "recipient_address": "ztestsapling12k9m98wmpjts2m56wc60qzhgsfvlpxcwah268xk5yz4h942sd58jy3jamqyxjwums6hw7kfa4cc"
+  },
+  "candidate_txids": [
+    "8f064d23c66dc36e32445e5f3b50e0f32ac3ddb78cff21fb521eb6c19c07c99a",
+    "61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649",
+    "15a677b6770c5505fb47439361d3d3a7c21238ee1a6874fdedad18ae96850590"
+  ],
+  "sensitive_txids": [
+    "61088726aaa7c25b0568dd7bf19955f4a57f7173034e720c924107ff05cd3649"
+  ],
+  "sensitive_addresses": [
+    "ztestsapling12k9m98wmpjts2m56wc60qzhgsfvlpxcwah268xk5yz4h942sd58jy3jamqyxjwums6hw7kfa4cc",
+    "ztestsapling1z489megpkwwmv3gt6jtldkrx8ry3pj2gyt27kv9f72kdprum0lktxf53p7kt97jd4tjcw4f7zaz"
+  ],
+  "limits": [
+    "Historical public test transaction bytes staged in synthetic blocks; not consensus validation.",
+    "The memo includes an original newline and trailing U+0001; neither is fabricated or normalized.",
+    "The memo's from address is an unauthenticated claim. The merchant reply_addr field uses the actual decrypted recipient address.",
+    "Ground truth is used only by the offline fixture gate and analyzer, never by live wallet ownership discovery."
+  ]
+}

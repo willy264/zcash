@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = ["crates/walletrpc", "crates/observer-proxy", "crates/subject-wallet", "crates/merchant-app", "crates/stager", "crates/analyzer"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"

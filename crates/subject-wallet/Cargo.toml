@@ -1,0 +1,24 @@
+[package]
+name = "subject-wallet"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+clap = { version = "4.6.7", features = ["derive"] }
+hex = "0.4.3"
+reqwest = { version = "0.13.5", default-features = false, features = ["json"] }
+sapling-crypto = { version = "0.9.0", default-features = false, features = ["std"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "net", "time"] }
+tonic = { version = "0.14.6", features = ["transport"] }
+walletrpc = { version = "0.1.0", path = "../walletrpc" }
+zcash_client_backend = { version = "0.25.0", default-features = false }
+zcash_keys = { version = "0.17.0", default-features = false, features = ["sapling", "std"] }
+# Historical cover notes predate ZIP 212; this feature preserves their trial-decryption semantics.
+zcash_note_encryption = { version = "0.5.1", features = ["pre-zip-212"] }
+zcash_primitives = { version = "0.31.0", default-features = false, features = ["std"] }
+zcash_protocol = "0.11.0"
+zip32 = "0.3.0"

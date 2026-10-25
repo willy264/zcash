@@ -1,0 +1,9 @@
+* text=auto
+*.rs text eol=lf
+*.toml text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+Makefile text eol=lf
+proto/*.proto text eol=lf -whitespace
+*.mp4 binary

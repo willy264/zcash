@@ -1,0 +1,14 @@
+{
+  "duration_seconds": 120,
+  "narration": "Synthetic speech from the documented walkthrough script",
+  "voice": "Microsoft Zira Desktop",
+  "report_sha256": "3d06bffede6410ff02ab9383cab46f396b31dbdcadb0045cfb7c3652f97f77ac",
+  "result_sha256": "82c910ecd5c1ec046ed4ba379c5e16ba1c6e14cc813b57afaa9cf57c3d903838",
+  "source_commit": null,
+  "leaks_exercised": [
+    "A1",
+    "A3"
+  ],
+  "transparent_fallback": "not exercised",
+  "capture": "Real generated report in headless Microsoft Edge; viewport movement only"
+}

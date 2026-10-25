@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/zcash/lightwalletd",
+  "tag": "v0.6.0",
+  "commit": "e7436d2adb9ab5828eb8a27de534e16218841fc2",
+  "source_sha256": "f86a93695b96588b1cb5e231ce174d5ede6c802feeb3a8fe3b7f49a349b65e08",
+  "go_version": "go1.27.3"
+}
