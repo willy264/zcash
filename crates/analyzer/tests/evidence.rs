@@ -40,6 +40,70 @@ fn input(fetches: &[&str], leaky_app: bool) -> RunInput {
     RunInput::parse(&obs, &app, &wallet).unwrap()
 }
 
+// Complete unsigned V4 test transaction. Its SHA256d display txid was checked
+// independently with Python hashlib; this input intentionally cannot move funds.
+const FALLBACK_RAW: &str = "0400008085202f890144444444444444444444444444444444444444444444444444444444444444440000000000ffffffff01509f7d01000000001976a914555555555555555555555555555555555555555588ac00000000820000000000000000000000000000";
+const FALLBACK_TXID: &str = "52c836366052c28b9d57fa30c7d081d5644c929a13e8a3eb9bf1da290343c9fc";
+
+fn attempt(submitted: bool) -> serde_json::Value {
+    json!({
+        "requested_pool":"sapling", "requested_value_zat":25010000,
+        "available_note_upper_bound_zat":25000000, "shielded_attempted":true,
+        "shielded_failure":"insufficient_scanned_value", "failure_detail":"requested amount exceeds all scanned notes",
+        "fallback_policy":if submitted {"transparent"} else {"refuse"},
+        "outcome":if submitted {"transparent_submission_attempted"} else {"refused"},
+        "fallback_raw_tx_hex":if submitted {Some(FALLBACK_RAW)} else {None},
+        "submitted_txid":if submitted {Some(FALLBACK_TXID)} else {None},
+        "transparent_destination":if submitted {Some("tmHVYzYLdw3nPgMxhcdZdpXCGQ9Mt9sVNSw")} else {None},
+        "submission_result":if submitted {Some(json!({"rpc_completed":true,"error_code":0,"error_message":""}))} else {None},
+        "consensus_valid":false,"funds_moved":false,
+        "input_model":"nonexistent prevout; unsigned input"
+    })
+}
+
+fn exercise_send(run: &mut RunInput, submitted: bool) {
+    run.wallet.mode = if submitted { "leaky" } else { "good" }.into();
+    run.wallet.send_attempt = Some(serde_json::from_value(attempt(submitted)).unwrap());
+    if submitted {
+        run.observations.push(
+            serde_json::from_value(json!({"seq":run.observations.len()+1,
+            "session":"subject-1","method":"SendTransaction",
+            "args":{"raw_tx_hex":FALLBACK_RAW,"has_transparent_component":false}}))
+            .unwrap(),
+        );
+    }
+}
+
+fn fallback_bytes() -> Vec<u8> {
+    (0..FALLBACK_RAW.len())
+        .step_by(2)
+        .map(|offset| u8::from_str_radix(&FALLBACK_RAW[offset..offset + 2], 16).unwrap())
+        .collect()
+}
+
+/// Make mutated observations and subject metadata agree, so rejection must come
+/// from structural validation rather than an incidental byte/txid mismatch.
+fn replace_captured_fallback(run: &mut RunInput, bytes: &[u8]) {
+    use sha2::{Digest, Sha256};
+    let raw = bytes
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
+    let txid = Sha256::digest(Sha256::digest(bytes))
+        .iter()
+        .rev()
+        .map(|byte| format!("{byte:02x}"))
+        .collect::<String>();
+    let attempt = run.wallet.send_attempt.as_mut().unwrap();
+    attempt.fallback_raw_tx_hex = Some(raw.clone());
+    attempt.submitted_txid = Some(txid);
+    run.observations
+        .iter_mut()
+        .find(|observation| observation.method == "SendTransaction")
+        .unwrap()
+        .args["raw_tx_hex"] = json!(raw);
+}
+
 #[test]
 fn real_expectations_require_both_the_detector_and_fix() {
     let leaky = analyze(&input(&["b", "a", "b", "c"], true), &gt()).unwrap();
@@ -141,6 +205,8 @@ fn failed_direct_cli_rerun_invalidates_old_green_entrypoints() {
             .arg(&truth_path)
             .arg("--output")
             .arg(&output)
+            .arg("--expected-leaks")
+            .arg("A1,A3")
             .output()
             .unwrap()
     };
@@ -285,8 +351,264 @@ fn broadcast_with_bad_bytes_is_an_error_not_a_clean_transparent_check() {
 #[test]
 fn transparent_output_is_detected_from_bytes_independent_of_proxy_boolean() {
     let mut run = input(&["a", "b", "c"], false);
-    // V1, no inputs, one 1-zat output with empty script, locktime zero.
-    let raw = "01000000000101000000000000000000000000";
-    run.observations.push(serde_json::from_value(json!({"seq":5,"session":"subject-1","method":"SendTransaction","args":{"raw_tx_hex":raw,"has_transparent_component":false}})).unwrap());
-    assert_eq!(analyze(&run, &gt()).unwrap().leaked_ids(), ["A2"]);
+    exercise_send(&mut run, true);
+    let result = analyze(&run, &gt()).unwrap();
+    assert_eq!(result.leaked_ids(), ["A2"]);
+    assert!(require_exercised(&result, &["A2".into()]).is_ok());
+    assert_eq!(result.submitted_transactions[0].raw_tx_hex, FALLBACK_RAW);
+    assert_eq!(result.submitted_transactions[0].txid, FALLBACK_TXID);
+    assert_eq!(
+        result.submitted_transactions[0].output_values_zat,
+        [25010000]
+    );
+    assert!(result
+        .findings
+        .iter()
+        .find(|f| f.id == "A2")
+        .unwrap()
+        .inference
+        .contains("acceptance is not established"));
+}
+
+#[test]
+fn a2_fixed_refusal_is_exercised_only_with_an_actual_attempt_and_no_send() {
+    let mut run = input(&["a", "b", "c"], false);
+    exercise_send(&mut run, false);
+    let result = analyze(&run, &gt()).unwrap();
+    assert!(result.leaked_ids().is_empty());
+    assert!(require_exercised(&result, &["A1".into(), "A3".into(), "A2".into()]).is_ok());
+    assert!(result.submitted_transactions.is_empty());
+
+    run.wallet.send_attempt.as_mut().unwrap().shielded_attempted = false;
+    assert!(analyze(&run, &gt())
+        .unwrap_err()
+        .to_string()
+        .contains("skipped"));
+    run.wallet.send_attempt = None;
+    let skipped = analyze(&run, &gt()).unwrap();
+    assert!(require_exercised(&skipped, &["A2".into()]).is_err());
+}
+
+#[test]
+fn a2_unknown_or_incomplete_attempts_are_rejected() {
+    for field in [
+        "outcome",
+        "requested_pool",
+        "shielded_failure",
+        "fallback_policy",
+    ] {
+        let mut value = attempt(false);
+        value[field] = json!("unknown");
+        assert!(
+            serde_json::from_value::<analyzer::SendAttempt>(value).is_err(),
+            "{field}"
+        );
+    }
+    let mut value = attempt(false);
+    value.as_object_mut().unwrap().remove("shielded_attempted");
+    assert!(serde_json::from_value::<analyzer::SendAttempt>(value).is_err());
+    let mut run = input(&["a", "b", "c"], false);
+    exercise_send(&mut run, true);
+    run.wallet.send_attempt = None;
+    assert!(analyze(&run, &gt())
+        .unwrap_err()
+        .to_string()
+        .contains("send_attempt"));
+}
+
+#[test]
+fn a2_refusal_cannot_hide_a_send_or_claim_a_constructed_replacement() {
+    let mut run = input(&["a", "b", "c"], false);
+    exercise_send(&mut run, true);
+    run.wallet.mode = "good".into();
+    run.wallet.send_attempt = Some(serde_json::from_value(attempt(false)).unwrap());
+    assert!(analyze(&run, &gt())
+        .unwrap_err()
+        .to_string()
+        .contains("refusal claimed"));
+    run.observations.pop();
+    run.wallet
+        .send_attempt
+        .as_mut()
+        .unwrap()
+        .fallback_raw_tx_hex = Some(FALLBACK_RAW.into());
+    assert!(analyze(&run, &gt()).is_err());
+}
+
+#[test]
+fn a2_submission_requires_the_exact_captured_transaction_and_one_send() {
+    let mut run = input(&["a", "b", "c"], false);
+    exercise_send(&mut run, true);
+    run.wallet
+        .send_attempt
+        .as_mut()
+        .unwrap()
+        .fallback_raw_tx_hex = Some(format!("{FALLBACK_RAW}00"));
+    assert!(analyze(&run, &gt())
+        .unwrap_err()
+        .to_string()
+        .contains("bytes differ"));
+    run.wallet
+        .send_attempt
+        .as_mut()
+        .unwrap()
+        .fallback_raw_tx_hex = Some(FALLBACK_RAW.into());
+    run.wallet.send_attempt.as_mut().unwrap().submitted_txid = Some("a".repeat(64));
+    assert!(analyze(&run, &gt())
+        .unwrap_err()
+        .to_string()
+        .contains("txid does not match"));
+    run.wallet.send_attempt.as_mut().unwrap().submitted_txid = Some(FALLBACK_TXID.into());
+    let captured = run.observations.pop().unwrap();
+    assert!(analyze(&run, &gt()).is_err());
+    run.observations.push(captured.clone());
+    run.observations.push(captured);
+    assert!(analyze(&run, &gt()).is_err());
+}
+
+#[test]
+fn a2_failure_amount_destination_and_rpc_result_must_be_consistent() {
+    for (field, value) in [
+        ("requested_value_zat", json!(25000000)),
+        ("requested_value_zat", json!(25020000)),
+        ("available_note_upper_bound_zat", json!(24999999)),
+        ("transparent_destination", json!("invented")),
+        ("consensus_valid", json!(true)),
+        ("funds_moved", json!(true)),
+        ("input_model", json!("funded and signed input")),
+        ("failure_detail", json!("")),
+        (
+            "submission_result",
+            json!({"rpc_completed":false,"error_code":0,"error_message":"failure"}),
+        ),
+    ] {
+        let mut run = input(&["a", "b", "c"], false);
+        exercise_send(&mut run, true);
+        let mut evidence = attempt(true);
+        evidence[field] = value;
+        run.wallet.send_attempt = Some(serde_json::from_value(evidence).unwrap());
+        assert!(analyze(&run, &gt()).is_err(), "{field}");
+    }
+}
+
+#[test]
+fn a2_parser_rejects_noncanonical_and_truncated_inputs_before_attempt_checks() {
+    for raw in ["0400008085202f89fd0100", "0400008085202f890144", "05000080"] {
+        let mut run = input(&["a", "b", "c"], false);
+        run.observations.push(serde_json::from_value(json!({"seq":5,"session":"subject-1","method":"SendTransaction","args":{"raw_tx_hex":raw}})).unwrap());
+        assert!(analyze(&run, &gt())
+            .unwrap_err()
+            .to_string()
+            .contains("cannot parse submitted transaction"));
+    }
+}
+
+#[test]
+fn a2_rejects_every_truncated_v4_tail_even_with_matching_bytes_and_rehashed_txid() {
+    let bytes = fallback_bytes();
+    assert_eq!(bytes.len(), 104);
+    // Byte 89 is just past locktime, where the generic prefix parser can finish.
+    // The expiry, Sapling value balance, and three empty vectors are still required.
+    for end in 89..bytes.len() {
+        let mut run = input(&["a", "b", "c"], false);
+        exercise_send(&mut run, true);
+        replace_captured_fallback(&mut run, &bytes[..end]);
+        let error = analyze(&run, &gt()).unwrap_err();
+        assert!(
+            format!("{error:#}").contains("truncated transaction"),
+            "tail ends at {end}: {error:#}"
+        );
+    }
+}
+
+#[test]
+fn a2_rejects_extra_tail_wrong_prevout_index_and_signed_input_after_rehashing() {
+    let original = fallback_bytes();
+    let mut extra = original.clone();
+    extra.push(0);
+    let mut prevout = original.clone();
+    prevout[9] ^= 1;
+    let mut index = original.clone();
+    index[41] = 1;
+    let mut signed = original.clone();
+    signed[45] = 1;
+    signed.insert(46, 0x51);
+    for (bytes, expected) in [
+        (extra, "unexpected trailing bytes"),
+        (prevout, "known nonexistent lab prevout"),
+        (index, "prevout index must be zero"),
+        (signed, "empty scriptSig"),
+    ] {
+        let mut run = input(&["a", "b", "c"], false);
+        exercise_send(&mut run, true);
+        replace_captured_fallback(&mut run, &bytes);
+        let error = analyze(&run, &gt()).unwrap_err();
+        assert!(format!("{error:#}").contains(expected), "{error:#}");
+    }
+}
+
+#[test]
+fn a2_requires_the_declared_expiry_empty_shielded_bundles_and_final_unsigned_model() {
+    for (offset, value, expected) in [
+        (46, 0xfe, "sequence must be final"),
+        (85, 1, "locktime must be zero"),
+        (89, 0, "expiry height"),
+        (93, 1, "zero Sapling value balance"),
+        (101, 1, "no Sapling spends"),
+        (102, 1, "no Sapling outputs"),
+        (103, 1, "no JoinSplits"),
+    ] {
+        let mut bytes = fallback_bytes();
+        bytes[offset] = value;
+        let mut run = input(&["a", "b", "c"], false);
+        exercise_send(&mut run, true);
+        replace_captured_fallback(&mut run, &bytes);
+        let error = analyze(&run, &gt()).unwrap_err();
+        assert!(format!("{error:#}").contains(expected), "{error:#}");
+    }
+    let mut bytes = fallback_bytes();
+    bytes.splice(101..102, [253, 0, 0]);
+    let mut run = input(&["a", "b", "c"], false);
+    exercise_send(&mut run, true);
+    replace_captured_fallback(&mut run, &bytes);
+    let error = analyze(&run, &gt()).unwrap_err();
+    assert!(format!("{error:#}").contains("noncanonical CompactSize"));
+}
+
+#[test]
+fn three_check_report_uses_captured_a2_data_and_same_send_request() {
+    let mut leaky = input(&["b", "a", "b", "c"], true);
+    let mut fixed = input(&["a", "b", "c"], false);
+    exercise_send(&mut leaky, true);
+    exercise_send(&mut fixed, false);
+    let expected = vec!["A1".into(), "A3".into(), "A2".into()];
+    let report = PairReport::new(
+        &gt(),
+        analyze(&leaky, &gt()).unwrap(),
+        analyze(&fixed, &gt()).unwrap(),
+        expected.clone(),
+    );
+    assert!(report.passed);
+    assert_eq!(report.exercised_checks, ["A1", "A3", "A2"]);
+    let html = render_report(&report);
+    assert!(html.contains("id=\"a2\""));
+    assert!(html.contains(FALLBACK_RAW));
+    assert!(html.contains("SendTransaction requests: 0"));
+    assert!(html.contains("LOCAL SUBJECT EVIDENCE"));
+    assert!(html.contains("acceptance is not established"));
+    fixed
+        .wallet
+        .send_attempt
+        .as_mut()
+        .unwrap()
+        .requested_value_zat += 1;
+    assert!(
+        !PairReport::new(
+            &gt(),
+            analyze(&leaky, &gt()).unwrap(),
+            analyze(&fixed, &gt()).unwrap(),
+            expected
+        )
+        .passed
+    );
 }

@@ -21,4 +21,5 @@ zcash_keys = { version = "0.17.0", default-features = false, features = ["saplin
 zcash_note_encryption = { version = "0.5.1", features = ["pre-zip-212"] }
 zcash_primitives = { version = "0.31.0", default-features = false, features = ["std"] }
 zcash_protocol = "0.11.0"
+zcash_transparent = "0.11.0"
 zip32 = "0.3.0"

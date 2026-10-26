@@ -1,4 +1,6 @@
+mod a2;
 mod report;
+use a2::{analyze_send, same_send_scenario};
 pub use report::render_report;
 
 use anyhow::{bail, ensure, Context, Result};
@@ -102,6 +104,75 @@ pub struct WalletEvidence {
     pub merchant_deliveries: usize,
     pub notes: Vec<Note>,
     pub memo_policy: String,
+    #[serde(default)]
+    pub send_attempt: Option<SendAttempt>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum RequestedPool {
+    Sapling,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ShieldedFailure {
+    InsufficientScannedValue,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum FallbackPolicy {
+    Refuse,
+    Transparent,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum SendOutcome {
+    Refused,
+    TransparentSubmissionAttempted,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SubmissionResult {
+    pub rpc_completed: bool,
+    pub error_code: Option<i32>,
+    pub error_message: String,
+}
+
+/// Subject-side exercise evidence is checked against the captured RPC bytes below.
+/// It establishes an attempted local policy decision, never consensus acceptance.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SendAttempt {
+    pub requested_pool: RequestedPool,
+    pub requested_value_zat: u64,
+    pub available_note_upper_bound_zat: u64,
+    pub shielded_attempted: bool,
+    pub shielded_failure: ShieldedFailure,
+    pub failure_detail: String,
+    pub fallback_policy: FallbackPolicy,
+    pub outcome: SendOutcome,
+    pub fallback_raw_tx_hex: Option<String>,
+    pub submitted_txid: Option<String>,
+    pub transparent_destination: Option<String>,
+    pub submission_result: Option<SubmissionResult>,
+    pub consensus_valid: bool,
+    pub funds_moved: bool,
+    pub input_model: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SubmittedTransaction {
+    pub observation_sequence: u64,
+    pub txid: String,
+    pub raw_tx_hex: String,
+    pub transparent_inputs: usize,
+    pub transparent_outputs: usize,
+    pub output_values_zat: Vec<u64>,
+    pub output_scripts_hex: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -168,6 +239,7 @@ pub struct RunResult {
     pub wallet: WalletEvidence,
     pub app_log_excerpt: String,
     pub full_window_schedule: bool,
+    pub submitted_transactions: Vec<SubmittedTransaction>,
 }
 
 impl RunResult {
@@ -206,7 +278,8 @@ impl PairReport {
             && enforce(&fixed, &[]).is_ok()
             && require_exercised(&fixed, &expected_leaks).is_ok()
             && leaky.wallet.scan_start == fixed.wallet.scan_start
-            && leaky.wallet.scan_end == fixed.wallet.scan_end;
+            && leaky.wallet.scan_end == fixed.wallet.scan_end
+            && same_send_scenario(&leaky.wallet.send_attempt, &fixed.wallet.send_attempt);
         let exercised_checks = leaky
             .findings
             .iter()
@@ -413,33 +486,7 @@ pub fn analyze(input: &RunInput, gt: &GroundTruth) -> Result<RunResult> {
         fix: "Scan locally. When memos are needed, retrieve every transaction in the same fixed public window in chain order, with no extra lookup for a match.",
         observation_sequences: a1_hits,
     };
-    let sends: Vec<_> = input
-        .observations
-        .iter()
-        .filter(|o| o.method == "SendTransaction")
-        .collect();
-    let mut transparent_sequences = Vec::new();
-    for send in &sends {
-        let raw = send
-            .args
-            .get("raw_tx_hex")
-            .and_then(Value::as_str)
-            .context("SendTransaction lacks raw transaction evidence")?;
-        if has_transparent(raw).context("cannot parse submitted transaction transparency")? {
-            transparent_sequences.push(send.seq);
-        }
-    }
-    let a2 = Finding {
-        id: "A2", title: "Silent transparent fallback", exercised: !sends.is_empty(), leaked: !transparent_sequences.is_empty(),
-        evidence: if sends.is_empty() { "Not exercised: this build does not construct or broadcast the fallback transaction.".into() }
-            else if transparent_sequences.is_empty() { "Submitted transaction prefixes have no transparent inputs or outputs.".into() }
-            else { format!("{} SendTransaction request(s) contain transparent inputs or outputs.", transparent_sequences.len()) },
-        inference: if sends.is_empty() { "No claim is made about transparent-fallback prevention.".into() }
-            else if transparent_sequences.is_empty() { "No transparent components found in the submitted bytes; transaction acceptance is not established.".into() }
-            else { "The submitted bytes reveal transparent transaction components to the server. Mining and public-chain acceptance are not established by this request.".into() },
-        fix: "Refuse a shielded send when shielded funds or support are insufficient; never silently construct a transparent replacement.",
-        observation_sequences: transparent_sequences,
-    };
+    let (a2, submitted_transactions) = analyze_send(input)?;
     let mut log_values = vec![input.app_log.clone()];
     for event in &app_events {
         log_values.extend(string_values(event));
@@ -488,6 +535,7 @@ pub fn analyze(input: &RunInput, gt: &GroundTruth) -> Result<RunResult> {
         wallet: w.clone(),
         app_log_excerpt: input.app_log.chars().take(2400).collect(),
         full_window_schedule,
+        submitted_transactions,
     })
 }
 
@@ -555,8 +603,28 @@ fn string_values(value: &Value) -> Vec<String> {
     }
 }
 
+struct TransparentPrefix {
+    bytes: Vec<u8>,
+    version: u32,
+    inputs: usize,
+    input_script_sizes: Vec<usize>,
+    outputs: usize,
+    output_values_zat: Vec<u64>,
+    output_scripts_hex: Vec<String>,
+}
+
+fn encode_hex(bytes: &[u8]) -> String {
+    use std::fmt::Write;
+    let mut text = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        write!(text, "{byte:02x}").expect("writing to a string cannot fail");
+    }
+    text
+}
+
 /// Parse only the transparent vectors, not consensus proofs or signatures.
-fn has_transparent(raw: &str) -> Result<bool> {
+/// The original CompactSize, bounds, header, group, and locktime checks remain mandatory.
+fn parse_transparent(raw: &str) -> Result<TransparentPrefix> {
     ensure!(
         raw.len().is_multiple_of(2) && raw.is_ascii(),
         "invalid transaction hex length"
@@ -590,22 +658,34 @@ fn has_transparent(raw: &str) -> Result<bool> {
         cursor.skip(12)?;
     }
     let inputs = cursor.count()?;
+    let mut input_script_sizes = Vec::new();
     for _ in 0..inputs {
         cursor.skip(36)?;
         let size = cursor.count()?;
+        input_script_sizes.push(size);
         cursor.skip(size)?;
         cursor.skip(4)?;
     }
     let outputs = cursor.count()?;
+    let mut output_values_zat = Vec::new();
+    let mut output_scripts_hex = Vec::new();
     for _ in 0..outputs {
-        cursor.skip(8)?;
+        output_values_zat.push(u64::from_le_bytes(cursor.take(8)?.try_into()?));
         let size = cursor.count()?;
-        cursor.skip(size)?;
+        output_scripts_hex.push(encode_hex(cursor.take(size)?));
     }
     if version < 5 {
         cursor.skip(4)?;
     }
-    Ok(inputs > 0 || outputs > 0)
+    Ok(TransparentPrefix {
+        bytes,
+        version,
+        inputs,
+        input_script_sizes,
+        outputs,
+        output_values_zat,
+        output_scripts_hex,
+    })
 }
 
 struct Cursor<'a> {

@@ -5,13 +5,17 @@ use std::{
     collections::HashSet,
     fs,
     path::{Path, PathBuf},
+    process::ExitCode,
     time::Duration,
+};
+use subject_wallet::fallback::{
+    exercise_fallback, SendAttempt, SubmissionReply, REFUSAL_EXIT_CODE,
 };
 use subject_wallet::{
     collect_public_responses, compact_note, full_notes, parse_transaction, verify_fixtures,
     ReceivedNote, WalletConfig,
 };
-use walletrpc::{BlockId, BlockRange, CompactTxStreamerClient, TxFilter};
+use walletrpc::{BlockId, BlockRange, CompactTxStreamerClient, RawTransaction, TxFilter};
 use zcash_primitives::transaction::TxId;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, ValueEnum)]
@@ -22,7 +26,9 @@ enum Mode {
 }
 
 #[derive(Parser, Debug)]
-#[command(about = "Darkroom receive-only subject using real Sapling trial decryption")]
+#[command(
+    about = "Darkroom subject using real Sapling trial decryption and optional lab fallback testing"
+)]
 struct Args {
     #[arg(long, value_enum, default_value = "good")]
     mode: Mode,
@@ -35,6 +41,9 @@ struct Args {
     /// Recover memos by fetching every transaction in the fixed public scan window.
     #[arg(long)]
     memo: bool,
+    /// Exercise a failed shielded-send policy; DARKROOM_FIX=1 refuses transparent fallback.
+    #[arg(long)]
+    exercise_fallback: bool,
     /// Full URL of the merchant reconciliation endpoint. Requires --memo.
     #[arg(long, requires = "memo")]
     merchant_url: Option<String>,
@@ -59,6 +68,8 @@ struct WalletEvidence {
     full_window_fetch_count: usize,
     targeted_fetch_count: usize,
     merchant_deliveries: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    send_attempt: Option<SendAttempt>,
     wallet_engine: &'static str,
 }
 
@@ -73,7 +84,7 @@ fn save_json(path: &Path, value: &impl Serialize) -> Result<()> {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> Result<ExitCode> {
     let args = Args::parse();
     let config = WalletConfig::read(&args.config)?;
     if args.verify_fixture {
@@ -82,7 +93,7 @@ async fn main() -> Result<()> {
             save_json(&output, &evidence)?;
         }
         println!("{}", serde_json::to_string_pretty(&evidence)?);
-        return Ok(());
+        return Ok(ExitCode::SUCCESS);
     }
     let key = config.viewing_key()?;
     let channel = tonic::transport::Endpoint::from_shared(args.endpoint)?
@@ -243,6 +254,33 @@ async fn main() -> Result<()> {
             merchant_deliveries += 1;
         }
     }
+    let send_attempt = if args.exercise_fallback {
+        let refuse = std::env::var("DARKROOM_FIX").is_ok_and(|value| value == "1");
+        Some(
+            exercise_fallback(&notes, config.scan_end, refuse, |bytes| {
+                let mut connection = client.clone();
+                async move {
+                    let reply = connection
+                        .send_transaction(RawTransaction {
+                            data: bytes,
+                            height: 0,
+                        })
+                        .await
+                        .context(
+                            "submit unsigned transparent test transaction through observer proxy",
+                        )?
+                        .into_inner();
+                    Ok(SubmissionReply {
+                        error_code: reply.error_code,
+                        error_message: reply.error_message,
+                    })
+                }
+            })
+            .await?,
+        )
+    } else {
+        None
+    };
     let evidence = WalletEvidence {
         schema_version: 1,
         mode: args.mode,
@@ -256,6 +294,7 @@ async fn main() -> Result<()> {
         full_window_fetch_count,
         targeted_fetch_count: targeted.len(),
         merchant_deliveries,
+        send_attempt,
         wallet_engine:
             "librustzcash + sapling-crypto; compact trial decryption; full memo decryption",
     };
@@ -273,5 +312,21 @@ async fn main() -> Result<()> {
         evidence.notes.len(),
         output.display()
     );
-    Ok(())
+    if let Some(attempt) = &evidence.send_attempt {
+        if attempt.outcome == "refused" {
+            eprintln!(
+                "Darkroom refused transparent fallback: {} No SendTransaction was issued.",
+                attempt.failure_detail
+            );
+            return Ok(ExitCode::from(REFUSAL_EXIT_CODE));
+        }
+        if let Some(submission) = &attempt.submission_result {
+            ensure!(
+                submission.rpc_completed,
+                "transparent test submission RPC failed (evidence saved): {}",
+                submission.error_message
+            );
+        }
+    }
+    Ok(ExitCode::SUCCESS)
 }

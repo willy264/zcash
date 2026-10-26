@@ -1,4 +1,5 @@
 use crate::{Finding, PairReport, RunResult};
+use std::collections::BTreeSet;
 use std::fmt::Write;
 
 pub fn escape(value: &str) -> String {
@@ -58,6 +59,44 @@ fn trace(run: &RunResult, report: &PairReport) -> String {
     html
 }
 
+fn send_trace(run: &RunResult) -> String {
+    let mut text = String::new();
+    if let Some(attempt) = &run.wallet.send_attempt {
+        let policy = match attempt.fallback_policy {
+            crate::FallbackPolicy::Refuse => "refuse",
+            crate::FallbackPolicy::Transparent => "transparent",
+        };
+        let outcome = match attempt.outcome {
+            crate::SendOutcome::Refused => "refused",
+            crate::SendOutcome::TransparentSubmissionAttempted => {
+                "transparent_submission_attempted"
+            }
+        };
+        let _ = writeln!(text, "LOCAL SUBJECT EVIDENCE / wallet.json\nshielded_attempted: {}\nrequested: {} zat\nscanned-note upper bound: {} zat\nfailure: {}\nfallback_policy: {policy}\noutcome: {outcome}\n", attempt.shielded_attempted, attempt.requested_value_zat, attempt.available_note_upper_bound_zat, attempt.failure_detail);
+    }
+    let _ = writeln!(
+        text,
+        "CAPTURED SERVER VIEW / observations.jsonl\nSendTransaction requests: {}",
+        run.submitted_transactions.len()
+    );
+    for transaction in &run.submitted_transactions {
+        let _ = writeln!(text, "\nobservation: #{}\ntxid (computed from bytes): {}\ntransparent inputs: {}\ntransparent outputs: {}", transaction.observation_sequence, transaction.txid, transaction.transparent_inputs, transaction.transparent_outputs);
+        for (index, (value, script)) in transaction
+            .output_values_zat
+            .iter()
+            .zip(&transaction.output_scripts_hex)
+            .enumerate()
+        {
+            let _ = writeln!(
+                text,
+                "output[{index}]: {value} zat\nscript[{index}]: {script}"
+            );
+        }
+        let _ = writeln!(text, "raw_tx_hex: {}", transaction.raw_tx_hex);
+    }
+    format!("<pre class=terminal><code>{}</code></pre><p class=trace-note>Local refusal evidence is separate from the server view. Amounts, scripts, and txid above are parsed or computed from captured transaction bytes.</p>", escape(&text))
+}
+
 fn panel(run: &RunResult, finding: &Finding, report: &PairReport, fixed: bool) -> String {
     let profile = if fixed { "fixed" } else { "leaky" };
     let label = if fixed {
@@ -68,6 +107,7 @@ fn panel(run: &RunResult, finding: &Finding, report: &PairReport, fixed: bool) -
     let trace_html = match finding.id {
         "A1" => format!("<div class=terminal>{}</div><p class=trace-note>Ordered request summary. Payment labels come from ground truth, not the observer.</p>", trace(run, report)),
         "A3" => format!("<pre class=terminal><code>{}</code></pre>", escape(&run.app_log_excerpt)),
+        "A2" => send_trace(run),
         _ => "".into(),
     };
     let download = if finding.id == "A3" {
@@ -75,7 +115,12 @@ fn panel(run: &RunResult, finding: &Finding, report: &PairReport, fixed: bool) -
     } else {
         "observations.jsonl"
     };
-    format!("<section class=\"evidence-panel {}\"><div class=panel-heading><span>{label}</span><strong class=state>{}</strong></div>{trace_html}<div class=explanation><h4>What the observer sees</h4><p>{}</p><h4>What that reveals</h4><p>{}</p><a class=text-link href=\"{profile}-{download}\" download>Download captured {download} <span aria-hidden=true>↗</span></a></div></section>", finding_state(finding), badge(finding), escape(&finding.evidence), escape(&finding.inference))
+    let local_send_download = if finding.id == "A2" {
+        format!("<br><a class=text-link href=\"{profile}-wallet.json\" download>Download local send-attempt evidence ↗</a>")
+    } else {
+        String::new()
+    };
+    format!("<section class=\"evidence-panel {}\"><div class=panel-heading><span>{label}</span><strong class=state>{}</strong></div>{trace_html}<div class=explanation><h4>What the observer sees</h4><p>{}</p><h4>What that reveals</h4><p>{}</p><a class=text-link href=\"{profile}-{download}\" download>Download captured {download} <span aria-hidden=true>↗</span></a>{local_send_download}</div></section>", finding_state(finding), badge(finding), escape(&finding.evidence), escape(&finding.inference))
 }
 
 pub fn render_report(report: &PairReport) -> String {
@@ -91,13 +136,18 @@ pub fn render_report(report: &PairReport) -> String {
             let _ = write!(cards, "<article class=unexercised><span class=case-id>{}</span><div><h3>{}</h3><p>{}</p></div><span class=neutral-badge>NOT EXERCISED</span></article>", before.id, escape(before.title), escape(&before.evidence));
             continue;
         }
-        let boundary = if before.id == "A1" {
+        let boundary = if before.id == "A1" || before.id == "A2" {
             "WALLET → LIGHT-WALLET SERVER"
         } else {
             "WALLET → MERCHANT LOGS"
         };
         let ground_truth = if before.id == "A1" {
             format!("Known truth: this wallet decrypted the fixture payment at height {} for {} zatoshi. The server-visible query identifies a transaction, not a recipient.", report.ground_truth.height, report.ground_truth.value_zat)
+        } else if before.id == "A2" {
+            match &report.leaky.wallet.send_attempt {
+                Some(attempt) => format!("Known test request: {} zatoshi in Sapling exceeds the {}-zatoshi upper bound from scanned notes. The two runs attempt the same request. The fallback is an unsigned test transaction with a nonexistent prevout; no funds move.", attempt.requested_value_zat, attempt.available_note_upper_bound_zat),
+                None => "No validated shielded-send attempt is available.".into(),
+            }
         } else {
             format!("Known truth: the encrypted fixture memo decrypts to “{}”. We compare that exact content against captured application logs.", report.ground_truth.memo_plaintext)
         };
@@ -129,7 +179,11 @@ pub fn render_report(report: &PairReport) -> String {
         Some(url) => format!("<a class=text-link href=\"{}\">Open the producing CI run ↗</a>", escape(url)),
         None => format!("<a class=text-link href=\"{}/actions\">View repository CI ↗</a><span class=kicker>LOCAL CAPTURE</span>", escape(&report.provenance.repository_url)),
     };
-    let video_link = if std::path::Path::new("docs/demo.mp4").is_file() {
+    let video_link = if std::path::Path::new("docs/demo.mp4").is_file()
+        && std::fs::read_to_string("docs/demo.json")
+            .ok()
+            .is_some_and(|metadata| video_matches_checks(&metadata, &report.exercised_checks))
+    {
         "<a class=text-link href=\"demo.mp4\">Watch the 2-minute walkthrough ↗</a>".to_owned()
     } else {
         String::new()
@@ -173,4 +227,54 @@ pub fn render_report(report: &PairReport) -> String {
     }
     html.push_str(remaining);
     html
+}
+
+fn video_matches_checks(metadata: &str, exercised: &[&str]) -> bool {
+    let Ok(metadata) = serde_json::from_str::<serde_json::Value>(metadata) else {
+        return false;
+    };
+    let Some(recorded) = metadata
+        .get("leaks_exercised")
+        .and_then(serde_json::Value::as_array)
+    else {
+        return false;
+    };
+    let Some(recorded) = recorded
+        .iter()
+        .map(serde_json::Value::as_str)
+        .collect::<Option<Vec<_>>>()
+    else {
+        return false;
+    };
+    let unique: BTreeSet<_> = recorded.iter().copied().collect();
+    unique.len() == recorded.len() && unique == exercised.iter().copied().collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::video_matches_checks;
+
+    #[test]
+    fn video_link_requires_the_current_exercised_checks() {
+        assert!(video_matches_checks(
+            r#"{"leaks_exercised":["A1","A3"]}"#,
+            &["A1", "A3"]
+        ));
+        assert!(!video_matches_checks(
+            r#"{"leaks_exercised":["A1","A3"]}"#,
+            &["A1", "A3", "A2"]
+        ));
+        assert!(video_matches_checks(
+            r#"{"leaks_exercised":["A2","A1","A3"]}"#,
+            &["A1", "A3", "A2"]
+        ));
+        for invalid in [
+            "{",
+            "{}",
+            r#"{"leaks_exercised":["A1",null]}"#,
+            r#"{"leaks_exercised":["A1","A1","A3"]}"#,
+        ] {
+            assert!(!video_matches_checks(invalid, &["A1", "A3"]));
+        }
+    }
 }

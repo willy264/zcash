@@ -1,5 +1,7 @@
 //! A deliberately small receive-only subject. Ground truth is never an input to scanning.
 
+pub mod fallback;
+
 use anyhow::{anyhow, bail, ensure, Context, Result};
 use sapling_crypto::{
     keys::PreparedIncomingViewingKey,

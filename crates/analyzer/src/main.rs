@@ -31,7 +31,7 @@ struct Args {
     app_log: Option<PathBuf>,
     #[arg(long)]
     wallet: Option<PathBuf>,
-    #[arg(long, default_value = "A1,A3", value_delimiter = ',')]
+    #[arg(long, default_value = "A1,A3,A2", value_delimiter = ',')]
     expected_leaks: Vec<String>,
 }
 
@@ -122,7 +122,7 @@ fn main() -> Result<()> {
     require_exercised(&report.fixed, &args.expected_leaks)
         .context("fixed run skipped an expected check")?;
     if !report.passed {
-        bail!("leaky and fixed runs must cover the identical scan window");
+        bail!("leaky and fixed runs must cover the identical scan window and send scenario");
     }
     println!(
         "PASS: leaky reproduced [{}]; fixed has zero observed findings.",

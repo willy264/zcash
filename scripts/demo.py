@@ -18,9 +18,13 @@ ROOT = Path(__file__).resolve().parents[1]
 EXE = ".exe" if os.name == "nt" else ""
 
 
-def run(args: list[str | Path], *, timeout: int = 1800) -> None:
+def run(args: list[str | Path], *, timeout: int = 1800, env: dict[str, str] | None = None, expected_returncode: int = 0) -> None:
     print("+ " + " ".join(map(str, args)), flush=True)
-    subprocess.run(list(map(str, args)), cwd=ROOT, check=True, timeout=timeout)
+    result = subprocess.run(list(map(str, args)), cwd=ROOT, env=env, check=False, timeout=timeout)
+    if result.returncode != expected_returncode:
+        raise RuntimeError(f"Expected exit {expected_returncode}, got {result.returncode}: {args[0]}")
+    if expected_returncode:
+        print(f"Observed expected shielded-send refusal (exit {expected_returncode}).", flush=True)
 
 
 def available(port: int) -> None:
@@ -32,10 +36,16 @@ def available(port: int) -> None:
 
 
 def copy_walkthrough() -> None:
+    report = json.loads((ROOT / "report/result.json").read_text(encoding="utf-8"))
+    metadata_path = ROOT / "docs/demo.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
+    matches = set(metadata.get("leaks_exercised", [])) == set(report["exercised_checks"])
     for name in ("demo.mp4", "demo.vtt", "demo.json"):
         source = ROOT / "docs" / name
-        if source.exists():
+        if matches and source.exists():
             shutil.copyfile(source, ROOT / "report" / name)
+        else:
+            (ROOT / "report" / name).unlink(missing_ok=True)
 
 
 class Service:
@@ -128,7 +138,8 @@ def main() -> None:
                 run([
                     binary("subject-wallet"), "--mode", mode, "--endpoint", "http://127.0.0.1:19067",
                     "--output", directory / "wallet.json", "--memo", "--merchant-url", "http://127.0.0.1:18080/reconcile",
-                ], timeout=120)
+                    "--exercise-fallback",
+                ], timeout=120, env=env, expected_returncode=3 if name == "fixed" else 0)
                 proxy.check_alive()
                 merchant.check_alive()
                 backend.check_alive()
