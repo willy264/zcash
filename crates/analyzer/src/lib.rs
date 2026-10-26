@@ -1,7 +1,9 @@
 mod a2;
+mod capture;
 mod report;
 use a2::{analyze_send, same_send_scenario};
-pub use report::render_report;
+pub use capture::CapturedPair;
+pub use report::{render_captured_report, render_report};
 
 use anyhow::{bail, ensure, Context, Result};
 use serde::{Deserialize, Serialize};

@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish_preview:
+        description: 'Publish the replay branch under its review path, preserving main Pages files'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -59,3 +64,48 @@ jobs:
     steps:
       - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
         id: deployment
+
+  replay-preview:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_preview && github.ref == 'refs/heads/report-interactive-replay'
+    needs: prove
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      pages: write
+      id-token: write
+    # Serialize with main publication; never cancel a production deployment.
+    concurrency:
+      group: darkroom-Darkroom privacy regression-refs/heads/main
+      cancel-in-progress: false
+      queue: max
+    environment:
+      name: github-pages-preview
+      url: https://willy264.github.io/zcash/previews/report-interactive-replay/
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download the unchanged main site and this run's branch report
+        run: |
+          main_run=$(python -c 'import json; print(json.load(open(".github/preview-base.json"))["main_run"])')
+          gh run download "$main_run" --name github-pages --dir .runs/main-pages
+          gh run download "$GITHUB_RUN_ID" --name "darkroom-report-$GITHUB_SHA" --dir .runs/branch-report
+      - name: Preserve the main site and add the isolated review path
+        run: |
+          python scripts/preview_pages.py prepare \
+            --main-archive .runs/main-pages/artifact.tar \
+            --branch-report .runs/branch-report --branch-sha "$GITHUB_SHA" \
+            --output .runs/preview-site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          name: darkroom-replay-preview
+          path: .runs/preview-site
+      - name: Recheck main before publication
+        run: python scripts/preview_pages.py check-main
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: darkroom-replay-preview
+      - name: Verify deployed main and preview bytes
+        run: python scripts/preview_pages.py verify --output .runs/preview-site

@@ -1,5 +1,6 @@
 use analyzer::{
-    analyze, enforce, render_report, require_exercised, GroundTruth, PairReport, RunInput,
+    analyze, enforce, render_captured_report, require_exercised, CapturedPair, GroundTruth,
+    RunInput,
 };
 use anyhow::{bail, Context, Result};
 use clap::{Parser, ValueEnum};
@@ -90,31 +91,17 @@ fn main() -> Result<()> {
     if args.observations.is_some() || args.app_log.is_some() || args.wallet.is_some() {
         bail!("individual evidence paths require --expect; otherwise use --runs");
     }
-    let mut results = Vec::new();
-    for profile in ["leaky", "fixed"] {
-        let dir = args.runs.join(profile);
-        let obs = dir.join("observations.jsonl");
-        let app = dir.join("app.log");
-        let wallet = dir.join("wallet.json");
-        let result = analyze(&input(&obs, &app, &wallet)?, &gt)
-            .with_context(|| format!("{profile} evidence validation failed"))?;
-        for (source, suffix) in [
-            (&obs, "observations.jsonl"),
-            (&app, "app.log"),
-            (&wallet, "wallet.json"),
-        ] {
-            fs::copy(source, args.output.join(format!("{profile}-{suffix}")))?;
-        }
-        results.push(result);
-    }
-    let fixed = results.pop().expect("fixed result");
-    let leaky = results.pop().expect("leaky result");
-    let report = PairReport::new(&gt, leaky, fixed, args.expected_leaks.clone());
+    let captured = CapturedPair::load(&args.runs, &gt, args.expected_leaks.clone())?;
+    captured.write_downloads(&args.output)?;
+    let report = captured.report();
     fs::write(
         args.output.join("result.json"),
-        serde_json::to_vec_pretty(&report)?,
+        serde_json::to_vec_pretty(report)?,
     )?;
-    fs::write(args.output.join("index.html"), render_report(&report))?;
+    fs::write(
+        args.output.join("index.html"),
+        render_captured_report(&captured),
+    )?;
     println!("Report: {}", args.output.join("index.html").display());
     enforce(&report.leaky, &args.expected_leaks)
         .context("leaky run did not reproduce the expected findings")?;

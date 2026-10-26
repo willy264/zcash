@@ -1,0 +1,15 @@
+{
+  "url": "https://willy264.github.io/zcash/",
+  "commit": "8f2749f8b893e25f32b1338207c8932fb7fab283",
+  "ci_run_url": "https://github.com/willy264/zcash/actions/runs/40279823921",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "report_sha256": "917c7e96b2b4fd8297f09946386ce91b221e562d2451b7427e7a48e04f8c42ee",
+  "result_sha256": "3879a1b906cc07436b201dbfc074075d9edb0551217c8839645c78e191aabb30",
+  "screenshots": {
+    "before-top.png": "a3ba97603644c9aa31b3823d4013b436888265cb7fd7f7fe8c7fd01b399f4619",
+    "before-a1.png": "c184d553aa19235849b07d6344d12d0e07a2cc7a96b122317a723bd4bbdf8442"
+  }
+}

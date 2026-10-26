@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "targets": [
+    {
+      "report_sha256": "b9ddfe753e90911c1a624ba218bad34dba0f7acf04a1cfde54d7225890a729b7",
+      "commit": null,
+      "ci_run_url": null,
+      "files": {
+        "fixed-app.log": "2adf59c7c24e251c9ff162a663edfb50394b41d184903871b8f8808113a91b6a",
+        "fixed-observations.jsonl": "5baf3deee4eb9d83d6f6bacecd9e7752b79ecd4b1ab3036a6fff80345828026a",
+        "fixed-wallet.json": "6c0686aa7eb5fa8e5218a67e5592101a2fafb459e4ff57d98bacb9641413eb8c",
+        "leaky-app.log": "6b5b42b3af2b9e3aa2bd8e824c9be674003fa615952a7f6f9a9511492b98e751",
+        "leaky-observations.jsonl": "78eee42d5fb2d8e20f4d5718a6d334081158f83907bf34ef7547c3c7e88256ae",
+        "leaky-wallet.json": "31f4d7d1d2b17b2b7e24b12fe6248c56f1529f236aa72a52ba4c04dc2c243dda"
+      },
+      "inline_script_sha256": "9rTGH5ZRiUxla8xsfhsLzTSrVSP/bj68aQNF+0OlMug=",
+      "url": "file:///C:/Users/HP/Documents/people/zcash/report/index.html",
+      "checks": [
+        "default leaky view",
+        "keyboard profile selection and focus",
+        "all counts and cards switch",
+        "exact original JSONL drawers",
+        "real sequence numbers and manual stepping",
+        "polite live announcements",
+        "A1 extra versus legitimate payment fetch",
+        "A3 separate application/RPC streams",
+        "A2 local refusal versus observed send",
+        "keyboard raw drawers and exact clipboard copy",
+        "all six browser downloads are byte-identical",
+        "390px mobile layout and expanded raw records",
+        "reduced motion",
+        "zero console errors or CSP violations",
+        "zero subresource/network requests",
+        "JavaScript-disabled complete before/after comparison"
+      ],
+      "passed": true
+    },
+    {
+      "report_sha256": "b9ddfe753e90911c1a624ba218bad34dba0f7acf04a1cfde54d7225890a729b7",
+      "commit": null,
+      "ci_run_url": null,
+      "files": {
+        "fixed-app.log": "2adf59c7c24e251c9ff162a663edfb50394b41d184903871b8f8808113a91b6a",
+        "fixed-observations.jsonl": "5baf3deee4eb9d83d6f6bacecd9e7752b79ecd4b1ab3036a6fff80345828026a",
+        "fixed-wallet.json": "6c0686aa7eb5fa8e5218a67e5592101a2fafb459e4ff57d98bacb9641413eb8c",
+        "leaky-app.log": "6b5b42b3af2b9e3aa2bd8e824c9be674003fa615952a7f6f9a9511492b98e751",
+        "leaky-observations.jsonl": "78eee42d5fb2d8e20f4d5718a6d334081158f83907bf34ef7547c3c7e88256ae",
+        "leaky-wallet.json": "31f4d7d1d2b17b2b7e24b12fe6248c56f1529f236aa72a52ba4c04dc2c243dda"
+      },
+      "inline_script_sha256": "9rTGH5ZRiUxla8xsfhsLzTSrVSP/bj68aQNF+0OlMug=",
+      "url": "http://127.0.0.1:65406/index.html",
+      "checks": [
+        "default leaky view",
+        "keyboard profile selection and focus",
+        "all counts and cards switch",
+        "exact original JSONL drawers",
+        "real sequence numbers and manual stepping",
+        "polite live announcements",
+        "A1 extra versus legitimate payment fetch",
+        "A3 separate application/RPC streams",
+        "A2 local refusal versus observed send",
+        "keyboard raw drawers and exact clipboard copy",
+        "all six browser downloads are byte-identical",
+        "390px mobile layout and expanded raw records",
+        "reduced motion",
+        "zero console errors or CSP violations",
+        "zero subresource/network requests",
+        "JavaScript-disabled complete before/after comparison"
+      ],
+      "passed": true
+    }
+  ]
+}

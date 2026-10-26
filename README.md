@@ -52,6 +52,14 @@ The A2 fallback is **constructed and submitted, not mined or consensus-valid**. 
 
 Fixture source, license, byte hashes, and the actual decrypted facts are recorded in `fixtures/`. The backend release and archive checksum are pinned in [scripts/backend.json](scripts/backend.json); vendored protocol provenance is in [proto/README.md](proto/README.md). Rust dependencies were selected with `cargo add` and are locked in `Cargo.lock`.
 
+## Replay the captured run
+
+The generated page includes **Replay of the captured run**: a leaky/fixed toggle for the counts, cards, and traces, plus manual controls to step through original captured records. It opens on the leaky run. Sensitive evidence is highlighted with the analyzer's inference; the fixed view retains its legitimate public-window payment lookup.
+
+The page embeds the same six evidence files that it offers for download, preserving their bytes and hashes. It runs offline from `report/index.html` with no backend, network requests, or external JavaScript. With JavaScript disabled, the full static before/after report remains available. The strict CSP authorizes only the hash of the embedded replay script. Application log order and local refusal evidence remain separate from RPC order.
+
+[Implementation and CSP details](docs/replay-implementation.md) explain the evidence boundary. [Browser review and screenshots](docs/replay-review.md) cover file, HTTP, accessibility, and no-JavaScript checks. This feature is on the unmerged `report-interactive-replay` review branch; its isolated preview is https://willy264.github.io/zcash/previews/report-interactive-replay/.
+
 ## Layout
 
 ```text
@@ -70,7 +78,7 @@ The subject's configuration contains its public test key and public scan range. 
 
 ## CI and publishing
 
-GitHub Actions runs format/lint checks, tests, the fixture gate, both captured profiles, and strict expectations. Only a successful run on `main` publishes `report/` to GitHub Pages. Branches and pull requests execute the same proof and upload a report artifact for review without deploying. The report includes the CI run/commit when generated in Actions. A walkthrough is linked and copied into the report only when its metadata lists the same exercised leaks, preventing an old two-leak video from being presented as the current three-leak walkthrough.
+GitHub Actions runs format/lint checks, tests, the fixture gate, both captured profiles, and strict expectations. Only a successful run on `main` publishes `report/` to GitHub Pages. Branches and pull requests execute the same proof and upload a report artifact for review. The replay branch has an explicit manual preview dispatch that preserves the pinned main Pages artifact byte-for-byte and adds only its isolated review path; ordinary branch pushes do not deploy. The report includes the CI run/commit when generated in Actions. A walkthrough is linked and copied into the report only when its metadata lists the same exercised leaks, preventing an old two-leak video from being presented as the current three-leak walkthrough.
 
 The [walkthrough script](docs/video-script.md) and [word-aligned captions](docs/demo.vtt) match the public three-check report. The recording uses conversational synthetic neural speech, not a human narrator; [capture metadata](docs/demo.json) pins the source report, successful CI run, audio timing, and artifact hashes. [Reconciliation notes](docs/video-reconciliation.md) document the corrected wording and screen timing.
 

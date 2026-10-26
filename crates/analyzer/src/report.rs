@@ -1,4 +1,6 @@
 use crate::{Finding, PairReport, RunResult};
+use base64::{engine::general_purpose::STANDARD, Engine};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 use std::fmt::Write;
 
@@ -120,10 +122,39 @@ fn panel(run: &RunResult, finding: &Finding, report: &PairReport, fixed: bool) -
     } else {
         String::new()
     };
-    format!("<section class=\"evidence-panel {}\"><div class=panel-heading><span>{label}</span><strong class=state>{}</strong></div>{trace_html}<div class=explanation><h4>What the observer sees</h4><p>{}</p><h4>What that reveals</h4><p>{}</p><a class=text-link href=\"{profile}-{download}\" download>Download captured {download} <span aria-hidden=true>↗</span></a>{local_send_download}</div></section>", finding_state(finding), badge(finding), escape(&finding.evidence), escape(&finding.inference))
+    format!("<section class=\"evidence-panel {}\" data-profile=\"{profile}\" data-check=\"{}\"><div class=panel-heading><span>{label}</span><strong class=state>{}</strong></div><div class=static-trace>{trace_html}</div><div class=explanation><h4>What the observer sees</h4><p>{}</p><h4>What that reveals</h4><p>{}</p><a class=text-link href=\"{profile}-{download}\" download>Download captured {download} <span aria-hidden=true>↗</span></a>{local_send_download}</div></section>", finding_state(finding), finding.id, badge(finding), escape(&finding.evidence), escape(&finding.inference))
 }
 
 pub fn render_report(report: &PairReport) -> String {
+    render(report, None)
+}
+
+/// The captured pair owns both the validated verdict and the exact source bytes.
+pub fn render_captured_report(captured: &crate::CapturedPair) -> String {
+    render(captured.report(), Some(&captured.replay_json()))
+}
+
+fn replay_assets(replay_json: &str) -> (String, String) {
+    // Browsers normalize CRLF before checking inline-script hashes. Normalize at
+    // generation as well so a Windows checkout produces the same runnable bytes.
+    let script = include_str!("replay.js")
+        .replace("\r\n", "\n")
+        .replace('\r', "\n");
+    let hash = STANDARD.encode(Sha256::digest(script.as_bytes()));
+    // JSON is inert data, but the HTML parser still recognizes </script> in it.
+    let data = replay_json
+        .replace('&', "\\u0026")
+        .replace('<', "\\u003c")
+        .replace('>', "\\u003e")
+        .replace('\u{2028}', "\\u2028")
+        .replace('\u{2029}', "\\u2029");
+    (
+        format!("script-src 'sha256-{hash}';"),
+        format!("<script id=\"replay-data\" type=\"application/json\">{data}</script><script>{script}</script>"),
+    )
+}
+
+fn render(report: &PairReport, replay_json: Option<&str>) -> String {
     let mut cards = String::new();
     for before in &report.leaky.findings {
         let after = report
@@ -188,7 +219,10 @@ pub fn render_report(report: &PairReport) -> String {
     } else {
         String::new()
     };
+    let (script_policy, replay_scripts) = replay_json.map(replay_assets).unwrap_or_default();
     let values = [
+        ("SCRIPT_POLICY", script_policy),
+        ("REPLAY_SCRIPTS", replay_scripts),
         ("STATUS", status.to_owned()),
         ("STATUS_CLASS", status_class.to_owned()),
         ("BEFORE_COUNT", report.leaky.leaked_ids().len().to_string()),
@@ -252,7 +286,55 @@ fn video_matches_checks(metadata: &str, exercised: &[&str]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::video_matches_checks;
+    use super::{replay_assets, video_matches_checks};
+    use base64::{engine::general_purpose::STANDARD, Engine};
+    use sha2::{Digest, Sha256};
+
+    #[test]
+    fn replay_csp_hash_matches_the_exact_inline_script_bytes() {
+        let (policy, assets) = replay_assets(r#"{"schema_version":1}"#);
+        let script = assets.split("</script><script>").nth(1).unwrap();
+        let script = script.strip_suffix("</script>").unwrap();
+        assert!(!script.contains('\r'));
+        let digest = STANDARD.encode(Sha256::digest(script.as_bytes()));
+        assert_eq!(policy, format!("script-src 'sha256-{digest}';"));
+        assert!(!policy.contains("unsafe-inline"));
+        assert!(!script.contains("innerHTML"));
+        assert!(!script.contains("document.write"));
+        assert!(!script.contains("fetch("));
+        assert!(!script.contains("setInterval"));
+    }
+
+    #[test]
+    fn replay_json_cannot_escape_the_inert_data_element() {
+        let original = serde_json::json!({
+            "memo": "</script><script>alert('memo')</script>&<img src=x>\u{2028}\u{2029}"
+        });
+        let (_, assets) = replay_assets(&original.to_string());
+        let data = assets
+            .strip_prefix("<script id=\"replay-data\" type=\"application/json\">")
+            .unwrap()
+            .split("</script>")
+            .next()
+            .unwrap();
+        assert!(!data.contains('<'));
+        assert!(!data.contains('&'));
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(data).unwrap(),
+            original
+        );
+        assert_eq!(assets.matches("</script>").count(), 2);
+    }
+
+    #[test]
+    fn replay_controls_are_hidden_without_javascript() {
+        let template = include_str!("template.html");
+        assert!(template
+            .contains("id=\"replay-controls\" aria-label=\"Captured run selection\" hidden"));
+        assert!(template.contains("id=\"selected-result\" hidden"));
+        assert!(template.contains("id=\"paired-counts\""));
+        assert!(template.contains("{{REPLAY_SCRIPTS}}"));
+    }
 
     #[test]
     fn video_link_requires_the_current_exercised_checks() {
