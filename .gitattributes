@@ -7,3 +7,5 @@
 Makefile text eol=lf
 proto/*.proto text eol=lf -whitespace
 *.mp4 binary
+docs/demo.vtt text eol=lf
+docs/demo.json text eol=lf

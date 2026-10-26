@@ -1,19 +1,159 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:13.000
-This payment is shielded. But the wallet's requests and the merchant's logs can still expose private facts. Darkroom tests that boundary with real encrypted transactions and captured traffic.
+00:00:00.106 --> 00:00:01.417
+The payment is shielded.
 
-00:00:13.000 --> 00:00:31.000
-A small Rust client uses Zcash wallet cryptography to decrypt a known test payment. Its requests pass through an observer to a controlled light-wallet server. The report keeps what the observer saw separate from the ground truth used to check the result.
+00:00:01.705 --> 00:00:03.498
+The extra lookup still leaks.
 
-00:00:31.000 --> 00:01:01.000
-Here is the extra GetTransaction request. It appears because the client recognized its payment. The request links this session to that transaction of interest. It does not, by itself, prove who received it. The fixed client scans locally. Because compact blocks do not contain memos, the memo demo retrieves every transaction in the same public window, once and in order. The selective extra request disappears. The detector checks the captured sequence, not a mode label.
+00:00:04.325 --> 00:00:07.271
+Across three checks, ten calls, and
 
-00:01:01.000 --> 00:01:24.000
-Now follow the decrypted memo to the merchant. The leaky service writes the memo and address into its application log. Encryption on chain cannot protect that plaintext copy. We enable field redaction and run the same payment again. The merchant still receives the memo, but its log no longer exposes those fields.
+00:00:07.347 --> 00:00:10.310
+three candidate transactions: three findings
 
-00:01:24.000 --> 00:01:49.000
-The build passes only when the leaky run reproduces both findings and the fixed run removes them. Empty logs, incomplete scans, or incorrect decrypted facts fail. These are real wallet requests and real decryption, replayed on a labeled test chain. Darkside does not check consensus. Transparent fallback is marked untested, and there is no anonymity percentage.
+00:00:10.310 --> 00:00:11.362
+before the fixes.
 
-00:01:49.000 --> 00:02:00.000
-Run make demo to reproduce the evidence. Darkroom tests specific privacy leaks beyond the shielded transaction. Open the traces, inspect the fixes, and put those checks in CI.
+00:00:11.639 --> 00:00:12.503
+Zero after.
+
+00:00:13.153 --> 00:00:15.565
+For A1, start with GetBlockRange.
+
+00:00:15.854 --> 00:00:17.522
+Both runs scan the same window.
+
+00:00:17.811 --> 00:00:19.439
+Now look at GetTransaction on the
+
+00:00:19.439 --> 00:00:19.940
+left.
+
+00:00:20.241 --> 00:00:22.003
+The payment appears twice.
+
+00:00:22.281 --> 00:00:24.987
+On the right, each candidate gets one
+lookup.
+
+00:00:25.646 --> 00:00:27.456
+That extra question is the leak.
+
+00:00:31.083 --> 00:00:33.123
+The extra lookup tells this server
+
+00:00:33.123 --> 00:00:34.644
+that the session is interested in
+
+00:00:34.644 --> 00:00:35.593
+that transaction.
+
+00:00:35.882 --> 00:00:37.374
+That's the limit of the claim.
+
+00:00:37.663 --> 00:00:39.402
+It doesn't identify the recipient.
+
+00:00:40.346 --> 00:00:42.451
+The fixed trace keeps GetBlockRange.
+
+00:00:42.752 --> 00:00:44.627
+For the memo, it fetches all
+
+00:00:44.627 --> 00:00:47.333
+three candidates once, in chain order.
+
+00:00:47.610 --> 00:00:49.503
+The extra GetTransaction is gone.
+
+00:00:50.138 --> 00:00:52.809
+That's the request I'd want CI to catch.
+
+00:01:01.083 --> 00:01:02.503
+A3 is app.log.
+
+00:01:02.792 --> 00:01:04.738
+The left side contains the decrypted
+
+00:01:04.738 --> 00:01:06.442
+memo and the address.
+
+00:01:06.719 --> 00:01:08.394
+My app wrote a plaintext copy
+
+00:01:08.394 --> 00:01:09.213
+into its log.
+
+00:01:09.491 --> 00:01:10.864
+That's a copy I didn't need.
+
+00:01:11.775 --> 00:01:13.426
+On the right, those fields say
+
+00:01:13.426 --> 00:01:14.127
+redacted.
+
+00:01:14.416 --> 00:01:15.212
+Same payment.
+
+00:01:15.501 --> 00:01:16.214
+Same check.
+
+00:01:16.492 --> 00:01:18.243
+Less private data in the log.
+
+00:01:18.520 --> 00:01:20.035
+That's a change I can actually review.
+
+00:01:24.094 --> 00:01:24.572
+A2.
+
+00:01:24.884 --> 00:01:26.081
+Here's SendTransaction.
+
+00:01:26.347 --> 00:01:28.481
+Unsigned transparent test bytes on the
+
+00:01:28.481 --> 00:01:28.982
+left.
+
+00:01:29.271 --> 00:01:31.482
+The fixed run refuses the send.
+
+00:01:31.771 --> 00:01:32.697
+No funds move.
+
+00:01:34.092 --> 00:01:35.146
+This is a staged chain.
+
+00:01:35.413 --> 00:01:37.490
+Darkside doesn't check consensus.
+
+00:01:38.224 --> 00:01:39.890
+I'm checking this server's view and
+
+00:01:39.890 --> 00:01:41.151
+these application logs.
+
+00:01:41.418 --> 00:01:44.150
+The leaky run shows three findings.
+
+00:01:44.441 --> 00:01:46.023
+The fixed run shows none.
+
+00:01:46.279 --> 00:01:48.528
+Other privacy leaks can still exist.
+
+00:01:49.094 --> 00:01:50.680
+make demo reruns the checks.
+
+00:01:50.969 --> 00:01:53.045
+The successful CI run and raw
+
+00:01:53.045 --> 00:01:54.466
+traces are linked here.
+
+00:01:54.743 --> 00:01:57.060
+I'd check those before trusting the green
+result.

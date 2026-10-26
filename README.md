@@ -2,7 +2,7 @@
 
 A privacy regression lab for Zcash wallet access patterns and application logs.
 
-[Live report](https://willy264.github.io/zcash/) · [CI runs](https://github.com/willy264/zcash/actions/workflows/ci.yml) · [Research](ZECATHON-RESEARCH.md)
+[Live report](https://willy264.github.io/zcash/) · [Two-minute video](https://willy264.github.io/zcash/demo.mp4) · [CI runs](https://github.com/willy264/zcash/actions/workflows/ci.yml) · [Research](ZECATHON-RESEARCH.md)
 
 Darkroom runs a small Rust wallet client against a staged chain, forwards its actual gRPC requests through an observer, and compares the observer's evidence with independently authored ground truth. The same encrypted payment runs through a deliberately leaky policy and a fixed policy. The analyzer fails unless the leaky run exposes exactly the expected facts and the fixed run removes those specific signals.
 
@@ -71,6 +71,8 @@ The subject's configuration contains its public test key and public scan range. 
 ## CI and publishing
 
 GitHub Actions runs format/lint checks, tests, the fixture gate, both captured profiles, and strict expectations. Only a successful run on `main` publishes `report/` to GitHub Pages. Branches and pull requests execute the same proof and upload a report artifact for review without deploying. The report includes the CI run/commit when generated in Actions. A walkthrough is linked and copied into the report only when its metadata lists the same exercised leaks, preventing an old two-leak video from being presented as the current three-leak walkthrough.
+
+The [walkthrough script](docs/video-script.md) and [word-aligned captions](docs/demo.vtt) match the public three-check report. The recording uses conversational synthetic neural speech, not a human narrator; [capture metadata](docs/demo.json) pins the source report, successful CI run, audio timing, and artifact hashes. [Reconciliation notes](docs/video-reconciliation.md) document the corrected wording and screen timing.
 
 The expected leaky findings are **A1, A3, and A2**. All three must be exercised in the fixed profile with zero findings. Empty traces, missing application events, wrong decrypted facts, missing scan coverage, absent or contradictory send/refusal evidence, unexpected findings, or leaks in the fixed run fail the build.
 

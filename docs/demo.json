@@ -1,14 +1,1409 @@
 {
   "duration_seconds": 120,
-  "narration": "Synthetic speech from the documented walkthrough script",
-  "voice": "Microsoft Zira Desktop",
-  "report_sha256": "3d06bffede6410ff02ab9383cab46f396b31dbdcadb0045cfb7c3652f97f77ac",
-  "result_sha256": "82c910ecd5c1ec046ed4ba379c5e16ba1c6e14cc813b57afaa9cf57c3d903838",
-  "source_commit": null,
+  "narration": "Synthetic neural speech; not a recording of a human narrator",
+  "voice": "en-US-AndrewMultilingualNeural",
+  "rate": "+6%",
+  "speech_service": "Microsoft Edge online speech via edge-tts",
+  "numeric_facts": {
+    "checks": 3,
+    "calls": 10,
+    "candidates": 3,
+    "leaky": 3,
+    "fixed": 0
+  },
+  "captions": "Verbatim narration aligned to actual TTS WordBoundary timings",
+  "caption_cues": 52,
+  "word_boundaries": 246,
+  "word_timings": [
+    {
+      "start": 0.10580942061558432,
+      "end": 0.16459209972657252,
+      "text": "The"
+    },
+    {
+      "start": 0.1763490343593072,
+      "end": 0.6348974017735552,
+      "text": "payment"
+    },
+    {
+      "start": 0.6819241432781514,
+      "end": 0.7642196946282663,
+      "text": "is"
+    },
+    {
+      "start": 0.7642206916546089,
+      "end": 1.3168225420780495,
+      "text": "shielded"
+    },
+    {
+      "start": 1.7048312957485745,
+      "end": 1.7518569405241937,
+      "text": "The"
+    },
+    {
+      "start": 1.7636149718859053,
+      "end": 2.0810841118127077,
+      "text": "extra"
+    },
+    {
+      "start": 2.0927991713390504,
+      "end": 2.4690519874031835,
+      "text": "lookup"
+    },
+    {
+      "start": 2.5866183426515024,
+      "end": 2.9040874825783045,
+      "text": "still"
+    },
+    {
+      "start": 2.91584441721104,
+      "end": 3.397906653890757,
+      "text": "leaks"
+    },
+    {
+      "start": 4.325445849247809,
+      "end": 4.783994216662058,
+      "text": "Across"
+    },
+    {
+      "start": 4.783995213688399,
+      "end": 5.136693282407014,
+      "text": "three"
+    },
+    {
+      "start": 5.136693282407014,
+      "end": 5.7363208773087075,
+      "text": "checks"
+    },
+    {
+      "start": 5.912711786774407,
+      "end": 6.1478435002447025,
+      "text": "ten"
+    },
+    {
+      "start": 6.159600434877438,
+      "end": 6.641662671557155,
+      "text": "calls"
+    },
+    {
+      "start": 6.829768640549197,
+      "end": 7.170751649741469,
+      "text": "and"
+    },
+    {
+      "start": 7.347100684100775,
+      "end": 7.723353500164909,
+      "text": "three"
+    },
+    {
+      "start": 7.7351094377713006,
+      "end": 8.181859992472765,
+      "text": "candidate"
+    },
+    {
+      "start": 8.181860989499109,
+      "end": 9.01662129489744,
+      "text": "transactions"
+    },
+    {
+      "start": 9.392874110961571,
+      "end": 9.804396733897567,
+      "text": "three"
+    },
+    {
+      "start": 9.816152671503959,
+      "end": 10.298214908183677,
+      "text": "findings"
+    },
+    {
+      "start": 10.309971842816411,
+      "end": 10.592130297791304,
+      "text": "before"
+    },
+    {
+      "start": 10.592130297791304,
+      "end": 10.65091297690229,
+      "text": "the"
+    },
+    {
+      "start": 10.662669911535026,
+      "end": 11.26229750643672,
+      "text": "fixes"
+    },
+    {
+      "start": 11.638551319527195,
+      "end": 11.979534328719467,
+      "text": "Zero"
+    },
+    {
+      "start": 11.99124938824581,
+      "end": 12.402772011181805,
+      "text": "after"
+    },
+    {
+      "start": 13.153291,
+      "end": 13.400916,
+      "text": "For"
+    },
+    {
+      "start": 13.41275,
+      "end": 13.860874,
+      "text": "A1"
+    },
+    {
+      "start": 14.132083,
+      "end": 14.367916,
+      "text": "start"
+    },
+    {
+      "start": 14.367916,
+      "end": 14.485832,
+      "text": "with"
+    },
+    {
+      "start": 14.485833,
+      "end": 15.464624,
+      "text": "GetBlockRange"
+    },
+    {
+      "start": 15.853791000000001,
+      "end": 16.089624,
+      "text": "Both"
+    },
+    {
+      "start": 16.101416,
+      "end": 16.419832,
+      "text": "runs"
+    },
+    {
+      "start": 16.490583,
+      "end": 16.655666,
+      "text": "scan"
+    },
+    {
+      "start": 16.655666,
+      "end": 16.714624,
+      "text": "the"
+    },
+    {
+      "start": 16.714624999999998,
+      "end": 16.974041,
+      "text": "same"
+    },
+    {
+      "start": 16.974041,
+      "end": 17.422166,
+      "text": "window"
+    },
+    {
+      "start": 17.811333,
+      "end": 18.011791,
+      "text": "Now"
+    },
+    {
+      "start": 18.21225,
+      "end": 18.365541,
+      "text": "look"
+    },
+    {
+      "start": 18.365583,
+      "end": 18.471708,
+      "text": "at"
+    },
+    {
+      "start": 18.471708,
+      "end": 19.297166,
+      "text": "GetTransaction"
+    },
+    {
+      "start": 19.297166,
+      "end": 19.379707,
+      "text": "on"
+    },
+    {
+      "start": 19.379708,
+      "end": 19.4268739,
+      "text": "the"
+    },
+    {
+      "start": 19.438665999999998,
+      "end": 19.839624,
+      "text": "left"
+    },
+    {
+      "start": 20.240583,
+      "end": 20.299540999999998,
+      "text": "The"
+    },
+    {
+      "start": 20.299540999999998,
+      "end": 20.676873999999998,
+      "text": "payment"
+    },
+    {
+      "start": 20.676875,
+      "end": 21.172166,
+      "text": "appears"
+    },
+    {
+      "start": 21.183958,
+      "end": 21.903291,
+      "text": "twice"
+    },
+    {
+      "start": 22.280666,
+      "end": 22.374999000000003,
+      "text": "On"
+    },
+    {
+      "start": 22.375,
+      "end": 22.4221659,
+      "text": "the"
+    },
+    {
+      "start": 22.433958,
+      "end": 22.728749,
+      "text": "right"
+    },
+    {
+      "start": 23.200457999999998,
+      "end": 23.389124000000002,
+      "text": "each"
+    },
+    {
+      "start": 23.389166,
+      "end": 23.955207,
+      "text": "candidate"
+    },
+    {
+      "start": 23.967,
+      "end": 24.143875,
+      "text": "gets"
+    },
+    {
+      "start": 24.143875,
+      "end": 24.438665999999998,
+      "text": "one"
+    },
+    {
+      "start": 24.450457999999998,
+      "end": 24.886791000000002,
+      "text": "lookup"
+    },
+    {
+      "start": 25.646124999999998,
+      "end": 25.799416,
+      "text": "That"
+    },
+    {
+      "start": 25.799416,
+      "end": 26.035249,
+      "text": "extra"
+    },
+    {
+      "start": 26.035291,
+      "end": 26.554166,
+      "text": "question"
+    },
+    {
+      "start": 26.754624999999997,
+      "end": 26.872541,
+      "text": "is"
+    },
+    {
+      "start": 26.872541,
+      "end": 26.955081999999997,
+      "text": "the"
+    },
+    {
+      "start": 26.955083,
+      "end": 27.356040999999998,
+      "text": "leak"
+    },
+    {
+      "start": 31.082541,
+      "end": 31.176874,
+      "text": "The"
+    },
+    {
+      "start": 31.176875,
+      "end": 31.483458,
+      "text": "extra"
+    },
+    {
+      "start": 31.495291,
+      "end": 31.955207,
+      "text": "lookup"
+    },
+    {
+      "start": 32.084916,
+      "end": 32.462291,
+      "text": "tells"
+    },
+    {
+      "start": 32.474041,
+      "end": 32.650916,
+      "text": "this"
+    },
+    {
+      "start": 32.66275,
+      "end": 33.110875,
+      "text": "server"
+    },
+    {
+      "start": 33.122625,
+      "end": 33.22875,
+      "text": "that"
+    },
+    {
+      "start": 33.228791,
+      "end": 33.299541,
+      "text": "the"
+    },
+    {
+      "start": 33.299541,
+      "end": 33.771249,
+      "text": "session"
+    },
+    {
+      "start": 33.783,
+      "end": 33.912708,
+      "text": "is"
+    },
+    {
+      "start": 34.007083,
+      "end": 34.525958,
+      "text": "interested"
+    },
+    {
+      "start": 34.53775,
+      "end": 34.643875,
+      "text": "in"
+    },
+    {
+      "start": 34.643875,
+      "end": 34.797166,
+      "text": "that"
+    },
+    {
+      "start": 34.797166,
+      "end": 35.492916,
+      "text": "transaction"
+    },
+    {
+      "start": 35.882083,
+      "end": 36.106124,
+      "text": "That's"
+    },
+    {
+      "start": 36.106125,
+      "end": 36.259416,
+      "text": "the"
+    },
+    {
+      "start": 36.271208,
+      "end": 36.719333,
+      "text": "limit"
+    },
+    {
+      "start": 36.719333,
+      "end": 36.790083,
+      "text": "of"
+    },
+    {
+      "start": 36.801875,
+      "end": 36.860833,
+      "text": "the"
+    },
+    {
+      "start": 36.860833,
+      "end": 37.273583,
+      "text": "claim"
+    },
+    {
+      "start": 37.66275,
+      "end": 37.7335,
+      "text": "It"
+    },
+    {
+      "start": 37.7335,
+      "end": 37.945750000000004,
+      "text": "doesn't"
+    },
+    {
+      "start": 37.945750000000004,
+      "end": 38.558958,
+      "text": "identify"
+    },
+    {
+      "start": 38.558958,
+      "end": 38.641498999999996,
+      "text": "the"
+    },
+    {
+      "start": 38.653291,
+      "end": 39.301874,
+      "text": "recipient"
+    },
+    {
+      "start": 40.346125,
+      "end": 40.405083,
+      "text": "The"
+    },
+    {
+      "start": 40.416875000000005,
+      "end": 40.640916000000004,
+      "text": "fixed"
+    },
+    {
+      "start": 40.65275,
+      "end": 41.065458,
+      "text": "trace"
+    },
+    {
+      "start": 41.065458,
+      "end": 41.407458,
+      "text": "keeps"
+    },
+    {
+      "start": 41.41925,
+      "end": 42.350833,
+      "text": "GetBlockRange"
+    },
+    {
+      "start": 42.751791,
+      "end": 42.822541,
+      "text": "For"
+    },
+    {
+      "start": 42.822541,
+      "end": 42.8697069,
+      "text": "the"
+    },
+    {
+      "start": 42.869708,
+      "end": 43.317833,
+      "text": "memo"
+    },
+    {
+      "start": 43.707,
+      "end": 43.77775,
+      "text": "it"
+    },
+    {
+      "start": 43.77775,
+      "end": 44.249458000000004,
+      "text": "fetches"
+    },
+    {
+      "start": 44.343790999999996,
+      "end": 44.614999,
+      "text": "all"
+    },
+    {
+      "start": 44.626791,
+      "end": 45.027749,
+      "text": "three"
+    },
+    {
+      "start": 45.02775,
+      "end": 45.593790999999996,
+      "text": "candidates"
+    },
+    {
+      "start": 45.593790999999996,
+      "end": 46.242374,
+      "text": "once"
+    },
+    {
+      "start": 46.442833,
+      "end": 46.548958,
+      "text": "in"
+    },
+    {
+      "start": 46.56075,
+      "end": 46.879166,
+      "text": "chain"
+    },
+    {
+      "start": 46.879166,
+      "end": 47.232957,
+      "text": "order"
+    },
+    {
+      "start": 47.610291000000004,
+      "end": 47.681041,
+      "text": "The"
+    },
+    {
+      "start": 47.692833,
+      "end": 48.105582999999996,
+      "text": "extra"
+    },
+    {
+      "start": 48.105582999999996,
+      "end": 48.954624,
+      "text": "GetTransaction"
+    },
+    {
+      "start": 48.966416,
+      "end": 49.060749,
+      "text": "is"
+    },
+    {
+      "start": 49.072541,
+      "end": 49.402749,
+      "text": "gone"
+    },
+    {
+      "start": 50.13834660544218,
+      "end": 50.303429605442176,
+      "text": "That's"
+    },
+    {
+      "start": 50.303429605442176,
+      "end": 50.38597060544218,
+      "text": "the"
+    },
+    {
+      "start": 50.397804605442175,
+      "end": 51.022804605442175,
+      "text": "request"
+    },
+    {
+      "start": 51.294013605442174,
+      "end": 51.43551360544218,
+      "text": "I'd"
+    },
+    {
+      "start": 51.44730460544218,
+      "end": 51.62417960544218,
+      "text": "want"
+    },
+    {
+      "start": 51.62422160544217,
+      "end": 52.04872160544218,
+      "text": "CI"
+    },
+    {
+      "start": 52.04872160544218,
+      "end": 52.154846605442174,
+      "text": "to"
+    },
+    {
+      "start": 52.166638605442174,
+      "end": 52.70909660544218,
+      "text": "catch"
+    },
+    {
+      "start": 61.082541,
+      "end": 61.542458,
+      "text": "A3"
+    },
+    {
+      "start": 61.707541,
+      "end": 61.813666,
+      "text": "is"
+    },
+    {
+      "start": 61.825458,
+      "end": 62.025916,
+      "text": "app."
+    },
+    {
+      "start": 62.03775,
+      "end": 62.403333,
+      "text": "log"
+    },
+    {
+      "start": 62.792458,
+      "end": 62.863208,
+      "text": "The"
+    },
+    {
+      "start": 62.863208,
+      "end": 63.087249,
+      "text": "left"
+    },
+    {
+      "start": 63.08725,
+      "end": 63.582541,
+      "text": "side"
+    },
+    {
+      "start": 63.582541,
+      "end": 64.018874,
+      "text": "contains"
+    },
+    {
+      "start": 64.030666,
+      "end": 64.136791,
+      "text": "the"
+    },
+    {
+      "start": 64.136791,
+      "end": 64.738207,
+      "text": "decrypted"
+    },
+    {
+      "start": 64.738208,
+      "end": 65.245291,
+      "text": "memo"
+    },
+    {
+      "start": 65.469333,
+      "end": 65.551874,
+      "text": "and"
+    },
+    {
+      "start": 65.551875,
+      "end": 65.646208,
+      "text": "the"
+    },
+    {
+      "start": 65.658,
+      "end": 66.341958,
+      "text": "address"
+    },
+    {
+      "start": 66.719333,
+      "end": 66.872624,
+      "text": "My"
+    },
+    {
+      "start": 66.884416,
+      "end": 67.084874,
+      "text": "app"
+    },
+    {
+      "start": 67.167458,
+      "end": 67.285374,
+      "text": "wrote"
+    },
+    {
+      "start": 67.297166,
+      "end": 67.3443319,
+      "text": "a"
+    },
+    {
+      "start": 67.344333,
+      "end": 67.910374,
+      "text": "plaintext"
+    },
+    {
+      "start": 67.910375,
+      "end": 68.33491599999999,
+      "text": "copy"
+    },
+    {
+      "start": 68.393875,
+      "end": 68.617916,
+      "text": "into"
+    },
+    {
+      "start": 68.617916,
+      "end": 68.724041,
+      "text": "its"
+    },
+    {
+      "start": 68.735833,
+      "end": 69.113208,
+      "text": "log"
+    },
+    {
+      "start": 69.490583,
+      "end": 69.608499,
+      "text": "That's"
+    },
+    {
+      "start": 69.60849999999999,
+      "end": 69.6556659,
+      "text": "a"
+    },
+    {
+      "start": 69.655666,
+      "end": 70.115582,
+      "text": "copy"
+    },
+    {
+      "start": 70.115583,
+      "end": 70.174541,
+      "text": "I"
+    },
+    {
+      "start": 70.186333,
+      "end": 70.398583,
+      "text": "didn't"
+    },
+    {
+      "start": 70.410375,
+      "end": 70.764166,
+      "text": "need"
+    },
+    {
+      "start": 71.77476360544217,
+      "end": 71.86909660544218,
+      "text": "On"
+    },
+    {
+      "start": 71.86909660544218,
+      "end": 71.91626250544218,
+      "text": "the"
+    },
+    {
+      "start": 71.91626360544217,
+      "end": 72.28184660544218,
+      "text": "right"
+    },
+    {
+      "start": 72.64742960544217,
+      "end": 72.87147060544217,
+      "text": "those"
+    },
+    {
+      "start": 72.87147160544218,
+      "end": 73.20167960544218,
+      "text": "fields"
+    },
+    {
+      "start": 73.21342960544217,
+      "end": 73.42567960544218,
+      "text": "say"
+    },
+    {
+      "start": 73.42572160544218,
+      "end": 74.02713760544218,
+      "text": "redacted"
+    },
+    {
+      "start": 74.41626360544217,
+      "end": 74.69926360544218,
+      "text": "Same"
+    },
+    {
+      "start": 74.71109660544218,
+      "end": 75.11205460544218,
+      "text": "payment"
+    },
+    {
+      "start": 75.50117960544218,
+      "end": 75.74880460544217,
+      "text": "Same"
+    },
+    {
+      "start": 75.76059660544217,
+      "end": 76.11438760544218,
+      "text": "check"
+    },
+    {
+      "start": 76.49176360544217,
+      "end": 76.64505460544217,
+      "text": "Less"
+    },
+    {
+      "start": 76.65684660544218,
+      "end": 77.08138760544217,
+      "text": "private"
+    },
+    {
+      "start": 77.08138860544217,
+      "end": 77.47055460544217,
+      "text": "data"
+    },
+    {
+      "start": 77.60022160544217,
+      "end": 77.70634660544218,
+      "text": "in"
+    },
+    {
+      "start": 77.70638860544217,
+      "end": 77.77713860544218,
+      "text": "the"
+    },
+    {
+      "start": 77.78892960544218,
+      "end": 78.14272060544218,
+      "text": "log"
+    },
+    {
+      "start": 78.52005460544217,
+      "end": 78.63797060544218,
+      "text": "That's"
+    },
+    {
+      "start": 78.63797160544217,
+      "end": 78.67334660544218,
+      "text": "a"
+    },
+    {
+      "start": 78.67334660544218,
+      "end": 78.99176260544218,
+      "text": "change"
+    },
+    {
+      "start": 78.99176360544217,
+      "end": 79.07430460544218,
+      "text": "I"
+    },
+    {
+      "start": 79.07430460544218,
+      "end": 79.16863760544217,
+      "text": "can"
+    },
+    {
+      "start": 79.16863860544217,
+      "end": 79.51063860544218,
+      "text": "actually"
+    },
+    {
+      "start": 79.51063860544218,
+      "end": 79.93517960544217,
+      "text": "review"
+    },
+    {
+      "start": 84.094333,
+      "end": 84.471708,
+      "text": "A2"
+    },
+    {
+      "start": 84.884416,
+      "end": 85.073082,
+      "text": "Here's"
+    },
+    {
+      "start": 85.073125,
+      "end": 85.981125,
+      "text": "SendTransaction"
+    },
+    {
+      "start": 86.346708,
+      "end": 86.830208,
+      "text": "Unsigned"
+    },
+    {
+      "start": 86.830208,
+      "end": 87.431583,
+      "text": "transparent"
+    },
+    {
+      "start": 87.431583,
+      "end": 87.738166,
+      "text": "test"
+    },
+    {
+      "start": 87.738208,
+      "end": 88.139166,
+      "text": "bytes"
+    },
+    {
+      "start": 88.292458,
+      "end": 88.410374,
+      "text": "on"
+    },
+    {
+      "start": 88.410375,
+      "end": 88.469333,
+      "text": "the"
+    },
+    {
+      "start": 88.481125,
+      "end": 88.882083,
+      "text": "left"
+    },
+    {
+      "start": 89.271208,
+      "end": 89.341958,
+      "text": "The"
+    },
+    {
+      "start": 89.353791,
+      "end": 89.695749,
+      "text": "fixed"
+    },
+    {
+      "start": 89.69575,
+      "end": 90.08491599999999,
+      "text": "run"
+    },
+    {
+      "start": 90.238208,
+      "end": 90.886791,
+      "text": "refuses"
+    },
+    {
+      "start": 90.886791,
+      "end": 90.957541,
+      "text": "the"
+    },
+    {
+      "start": 90.957541,
+      "end": 91.382082,
+      "text": "send"
+    },
+    {
+      "start": 91.771208,
+      "end": 91.948083,
+      "text": "No"
+    },
+    {
+      "start": 91.948125,
+      "end": 92.231125,
+      "text": "funds"
+    },
+    {
+      "start": 92.231125,
+      "end": 92.596708,
+      "text": "move"
+    },
+    {
+      "start": 94.09192725397679,
+      "end": 94.18385450795358,
+      "text": "This"
+    },
+    {
+      "start": 94.18385450795358,
+      "end": 94.26429048974678,
+      "text": "is"
+    },
+    {
+      "start": 94.26429146424408,
+      "end": 94.31025450653411,
+      "text": "a"
+    },
+    {
+      "start": 94.31029553287051,
+      "end": 94.70102802203152,
+      "text": "staged"
+    },
+    {
+      "start": 94.71247933982573,
+      "end": 95.04575741706343,
+      "text": "chain"
+    },
+    {
+      "start": 95.41346740746789,
+      "end": 95.93059999265915,
+      "text": "Darkside"
+    },
+    {
+      "start": 96.0570010631867,
+      "end": 96.3212925274308,
+      "text": "doesn't"
+    },
+    {
+      "start": 96.32133345631748,
+      "end": 96.56264335069169,
+      "text": "check"
+    },
+    {
+      "start": 96.56264335069169,
+      "end": 97.39003151436408,
+      "text": "consensus"
+    },
+    {
+      "start": 98.22379581388259,
+      "end": 98.32721434004297,
+      "text": "I'm"
+    },
+    {
+      "start": 98.32721434004297,
+      "end": 98.68347398715052,
+      "text": "checking"
+    },
+    {
+      "start": 98.68347398715052,
+      "end": 98.80987408318077,
+      "text": "this"
+    },
+    {
+      "start": 98.80987505767807,
+      "end": 99.2006075468391,
+      "text": "server's"
+    },
+    {
+      "start": 99.21209881902269,
+      "end": 99.64879542242075,
+      "text": "view"
+    },
+    {
+      "start": 99.76370424626741,
+      "end": 99.87861307011407,
+      "text": "and"
+    },
+    {
+      "start": 99.89010531679496,
+      "end": 100.06246952706225,
+      "text": "these"
+    },
+    {
+      "start": 100.06246952706225,
+      "end": 100.62556622649056,
+      "text": "application"
+    },
+    {
+      "start": 100.62556622649056,
+      "end": 101.05077155770505,
+      "text": "logs"
+    },
+    {
+      "start": 101.41848252260681,
+      "end": 101.49891850440001,
+      "text": "The"
+    },
+    {
+      "start": 101.51045070547028,
+      "end": 101.84368785382128,
+      "text": "leaky"
+    },
+    {
+      "start": 101.84368785382128,
+      "end": 102.25740191285217,
+      "text": "run"
+    },
+    {
+      "start": 102.26889318503576,
+      "end": 102.69409851625024,
+      "text": "shows"
+    },
+    {
+      "start": 102.78602674472432,
+      "end": 103.25719619017585,
+      "text": "three"
+    },
+    {
+      "start": 103.26864653347276,
+      "end": 104.05007155740542,
+      "text": "findings"
+    },
+    {
+      "start": 104.44080404656643,
+      "end": 104.48676708885645,
+      "text": "The"
+    },
+    {
+      "start": 104.48676816080348,
+      "end": 104.84302780791103,
+      "text": "fixed"
+    },
+    {
+      "start": 104.90048319433167,
+      "end": 105.2797244113091,
+      "text": "run"
+    },
+    {
+      "start": 105.29121568349268,
+      "end": 105.60147126197381,
+      "text": "shows"
+    },
+    {
+      "start": 105.60147126197381,
+      "end": 105.92325806702792,
+      "text": "none"
+    },
+    {
+      "start": 106.2794777597461,
+      "end": 106.45184197001339,
+      "text": "Other"
+    },
+    {
+      "start": 106.45188289890007,
+      "end": 106.88853857341145,
+      "text": "privacy"
+    },
+    {
+      "start": 106.88853857341145,
+      "end": 107.35970801886297,
+      "text": "leaks"
+    },
+    {
+      "start": 107.50909065926041,
+      "end": 107.64698202747424,
+      "text": "can"
+    },
+    {
+      "start": 107.65851325404721,
+      "end": 107.9113134461077,
+      "text": "still"
+    },
+    {
+      "start": 107.91131442060501,
+      "end": 108.42844700579627,
+      "text": "exist"
+    },
+    {
+      "start": 109.094333,
+      "end": 109.271208,
+      "text": "make"
+    },
+    {
+      "start": 109.271208,
+      "end": 109.601416,
+      "text": "demo"
+    },
+    {
+      "start": 109.613208,
+      "end": 110.014166,
+      "text": "reruns"
+    },
+    {
+      "start": 110.025958,
+      "end": 110.0731239,
+      "text": "the"
+    },
+    {
+      "start": 110.073125,
+      "end": 110.580208,
+      "text": "checks"
+    },
+    {
+      "start": 110.969333,
+      "end": 111.0164989,
+      "text": "The"
+    },
+    {
+      "start": 111.0165,
+      "end": 111.535375,
+      "text": "successful"
+    },
+    {
+      "start": 111.535375,
+      "end": 112.007083,
+      "text": "CI"
+    },
+    {
+      "start": 112.007083,
+      "end": 112.443416,
+      "text": "run"
+    },
+    {
+      "start": 112.67925,
+      "end": 112.82075,
+      "text": "and"
+    },
+    {
+      "start": 112.832541,
+      "end": 113.044791,
+      "text": "raw"
+    },
+    {
+      "start": 113.044791,
+      "end": 113.587249,
+      "text": "traces"
+    },
+    {
+      "start": 113.58725,
+      "end": 113.764125,
+      "text": "are"
+    },
+    {
+      "start": 113.775958,
+      "end": 114.047166,
+      "text": "linked"
+    },
+    {
+      "start": 114.047166,
+      "end": 114.365582,
+      "text": "here"
+    },
+    {
+      "start": 114.742916,
+      "end": 114.884416,
+      "text": "I'd"
+    },
+    {
+      "start": 114.884416,
+      "end": 115.096666,
+      "text": "check"
+    },
+    {
+      "start": 115.096708,
+      "end": 115.320749,
+      "text": "those"
+    },
+    {
+      "start": 115.32075,
+      "end": 115.780666,
+      "text": "before"
+    },
+    {
+      "start": 115.780666,
+      "end": 116.216999,
+      "text": "trusting"
+    },
+    {
+      "start": 116.217,
+      "end": 116.28775,
+      "text": "the"
+    },
+    {
+      "start": 116.28775,
+      "end": 116.535375,
+      "text": "green"
+    },
+    {
+      "start": 116.535375,
+      "end": 116.95991599999999,
+      "text": "result"
+    }
+  ],
+  "on_screen_claim_timings": [
+    {
+      "phrase": "A1",
+      "start": 13.41275,
+      "end": 13.860874,
+      "visible_slot": [
+        13,
+        31
+      ]
+    },
+    {
+      "phrase": "GetBlockRange",
+      "start": 14.485833,
+      "end": 15.464624,
+      "visible_slot": [
+        13,
+        31
+      ]
+    },
+    {
+      "phrase": "A3",
+      "start": 61.082541,
+      "end": 61.542458,
+      "visible_slot": [
+        61,
+        84
+      ]
+    },
+    {
+      "phrase": "app.log",
+      "start": 61.825458,
+      "end": 62.403333,
+      "visible_slot": [
+        61,
+        84
+      ]
+    },
+    {
+      "phrase": "A2",
+      "start": 84.094333,
+      "end": 84.471708,
+      "visible_slot": [
+        84,
+        94
+      ]
+    },
+    {
+      "phrase": "SendTransaction",
+      "start": 85.073125,
+      "end": 85.981125,
+      "visible_slot": [
+        84,
+        94
+      ]
+    },
+    {
+      "phrase": "unsigned",
+      "start": 86.346708,
+      "end": 86.830208,
+      "visible_slot": [
+        84,
+        94
+      ]
+    },
+    {
+      "phrase": "refuses",
+      "start": 90.238208,
+      "end": 90.886791,
+      "visible_slot": [
+        84,
+        94
+      ]
+    },
+    {
+      "phrase": "Darkside",
+      "start": 95.41346740746789,
+      "end": 95.93059999265915,
+      "visible_slot": [
+        94,
+        109
+      ]
+    },
+    {
+      "phrase": "consensus",
+      "start": 96.56264335069169,
+      "end": 97.39003151436408,
+      "visible_slot": [
+        94,
+        109
+      ]
+    },
+    {
+      "phrase": "successful CI run",
+      "start": 111.0165,
+      "end": 112.443416,
+      "visible_slot": [
+        109,
+        116
+      ]
+    },
+    {
+      "phrase": "raw traces",
+      "start": 112.832541,
+      "end": 113.587249,
+      "visible_slot": [
+        109,
+        116
+      ]
+    },
+    {
+      "phrase": "linked here",
+      "start": 113.775958,
+      "end": 114.365582,
+      "visible_slot": [
+        109,
+        116
+      ]
+    }
+  ],
+  "report_sha256": "f6e114a8c16e830ec13c086e9053bf328a4fc9a4b158474c66fd772ea8d36a8b",
+  "result_sha256": "5d07802cdc971f592ca405161b0840a3e296b0fe827dd70e93936ec92149cc2c",
+  "live_source": {
+    "public_url": "https://willy264.github.io/zcash/",
+    "downloaded_at_utc": "2026-10-26T06:17:13.709258+00:00",
+    "hashes": {
+      "index.html": "f6e114a8c16e830ec13c086e9053bf328a4fc9a4b158474c66fd772ea8d36a8b",
+      "result.json": "5d07802cdc971f592ca405161b0840a3e296b0fe827dd70e93936ec92149cc2c",
+      "leaky-observations.jsonl": "52d81b136d94020ed39d749ccdf00832213804d113317ecd01187db52c1ad5e5",
+      "fixed-observations.jsonl": "7d2258ec140b63608a1c8966f98099f9fa5aa8aeee496380a03e6cc8bc3b5379",
+      "leaky-app.log": "6b5b42b3af2b9e3aa2bd8e824c9be674003fa615952a7f6f9a9511492b98e751",
+      "fixed-app.log": "2adf59c7c24e251c9ff162a663edfb50394b41d184903871b8f8808113a91b6a",
+      "leaky-wallet.json": "31f4d7d1d2b17b2b7e24b12fe6248c56f1529f236aa72a52ba4c04dc2c243dda",
+      "fixed-wallet.json": "6c0686aa7eb5fa8e5218a67e5592101a2fafb459e4ff57d98bacb9641413eb8c"
+    },
+    "ci_run_url": "https://github.com/willy264/zcash/actions/runs/40277992851",
+    "ci_commit": "8e3302ad115a476c2a3881b062d60d84f36edcdb",
+    "ci_conclusion": "success",
+    "expected_checks": [
+      "A1",
+      "A2",
+      "A3"
+    ]
+  },
+  "source_commit": "8e3302ad115a476c2a3881b062d60d84f36edcdb",
   "leaks_exercised": [
     "A1",
+    "A2",
     "A3"
   ],
-  "transparent_fallback": "not exercised",
-  "capture": "Real generated report in headless Microsoft Edge; viewport movement only"
+  "transparent_fallback": "Unsigned transparent test submission after local insufficient scanned funds; no funds moved or consensus claim",
+  "capture": "Updated public report in Microsoft Edge; same original viewing sequence",
+  "recording_lead_in": {
+    "trim_seconds": 1.2400000000000002,
+    "first_cut_raw_seconds": 14.24,
+    "first_cut_output_seconds": 13,
+    "scene_score": 0.131708
+  },
+  "video_sha256": "b4532feda8c1279f11cf27b634e84b808b4d7b43460313abbabac076c267ca76",
+  "captions_sha256": "857c78581ea6b8169fae7d274f1f5f2a17f4c6972e4de4e0fb063012f4e61b87",
+  "narration_source_sha256": "b80e6dbafd01ee2011f4cb4617040d670b9f6fee4e7cc9668c5e064f8f1c04ba"
 }
