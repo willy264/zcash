@@ -1,6 +1,6 @@
 # Replay review
 
-The replay is developed on `report-interactive-replay`. Main remains at `8f2749f8b893e25f32b1338207c8932fb7fab283` during this review.
+This records the completed review on `report-interactive-replay`, before its merge into main. The baseline during that review was `8f2749f8b893e25f32b1338207c8932fb7fab283`. The current replay is published at https://willy264.github.io/zcash/; main publication removes the historical preview path below.
 
 The [deployed branch preview](https://willy264.github.io/zcash/previews/report-interactive-replay/) passed the full browser verification against source commit `e49b27fc660f3dee5ee2e681e404fcae207ace16`, produced by [CI run 40282343938](https://github.com/willy264/zcash/actions/runs/40282343938). The [deployed verification record](replay/preview-verification.json) records the served report SHA-256, all six evidence-file hashes, script hash, source commit, and successful behavior checks. The report HTML SHA-256 is `14f6048024ac817b74d1754d28aa5d4aeb619de3e976a65dd14ca10ca4a1e945`.
 

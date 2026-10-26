@@ -1,6 +1,6 @@
 # Captured-run replay
 
-This review feature lives on `report-interactive-replay`. It adds no wallet execution, backend, analytics, or network request to the report. The label **Replay of the captured run** identifies the interaction as a view of saved evidence.
+This feature was reviewed on `report-interactive-replay` and is included in the main report. It adds no wallet execution, backend, analytics, or network request to the report. The label **Replay of the captured run** identifies the interaction as a view of saved evidence.
 
 The leaky profile is selected first. Changing profiles switches the displayed counts and evidence panels together. The complete captured run is visible initially; the step controls let a reader restart and reveal records in their recorded order. Findings still describe the complete validated run, not just the currently visible prefix. Turning JavaScript off preserves the original static before/after comparison, downloads, methodology, and trust boundary.
 
@@ -22,7 +22,9 @@ The existing policy retains `default-src 'none'`, its existing inline-style allo
 
 Controls use native keyboard-operable elements and concise live status announcements. Stepping is manual; no animation or automatic playback is introduced. Existing reduced-motion styling remains in effect.
 
-## Isolated Pages preview
+## Historical isolated Pages preview
+
+The following workflow was used to review the branch before its merge. Main publication replaces that preview site; use https://willy264.github.io/zcash/ for the current replay. The historical workflow refuses to redeploy its old baseline after main advances.
 
 Normal branch pushes run the same proof and upload an artifact. A manual dispatch with `publish_preview=true` on this exact branch additionally composes a site from two CI artifacts: the pinned successful main site, unchanged at its original paths, and the branch report under `previews/report-interactive-replay/`.
 
